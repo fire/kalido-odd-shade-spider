@@ -28,14 +28,10 @@ const scene = new THREE.Scene();
 // light
 const light = new THREE.DirectionalLight(0xffffff);
 light.position.set(1.0, 1.0, 1.0).normalize();
-scene.add(light);
-
 // helpers
 const gridHelper = new THREE.GridHelper(10, 10);
-scene.add(gridHelper);
-
 const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+scene.add(axesHelper,gridHelper,light);
 
 // Main Render Loop
 const clock = new THREE.Clock();
@@ -65,8 +61,7 @@ loader.load(
     THREE.VRM.from(gltf).then(vrm => {
       scene.add(vrm.scene);
       currentVrm = vrm;
-      //rotate model 180deg to face camera
-      currentVrm.scene.rotation.y = Math.PI;
+      currentVrm.scene.rotation.y = Math.PI; //rotate model 180deg to face camera
     });
   },
 
@@ -82,24 +77,22 @@ loader.load(
 
 
 
-const rigJoint = (name, jointName, rotation) => {
-  //return early if character model not loaded
+const rigJoint = (name, rotation) => {
   if (!currentVrm) {
+    //return early if character not loaded
     return;
   }
   const Part = currentVrm.humanoid.getBoneNode(
     THREE.VRMSchema.HumanoidBoneName[name]
   );
-  //return early if model doesn't have part
   if (!Part) {
+    //return early if part doesn't exist
     return;
   }
 
   let euler = new THREE.Euler(rotation.x, rotation.y, rotation.z);
   let quaternion = new THREE.Quaternion.setFromEuler(euler);
-  //spherical linear interpolation
-  quaternion.slerpQuaternions(quaternion, Part.quaternion);
-  //copy quaternion to part
+  quaternion.slerpQuaternions(quaternion, Part.quaternion); //interpolate before copying rotation
   Part.quaternion.copy(quaternion);
 };
 
@@ -111,7 +104,7 @@ const rigCharacter = (vrm, rotations) => {
   //rotation array from blazepose ghum
 
   //unsure if NECK_01 or HEAD_01
-  rigJoint("Neck", "NECK_01", rotations);
+  rigJoint("Neck", rotations);
 
   //unsure of order Spine order
   // rigJoint("UpperChest", "SPINE_03", rotations);
@@ -122,14 +115,14 @@ const rigCharacter = (vrm, rotations) => {
 
   // unsure if shoulder joints need to be updated
   //         rigJoint("RightShoulder", "UPPERARM_L", rotations);
-  rigJoint("RightUpperArm", "UPPERARM_R", rotations);
-  rigJoint("RightLowerArm", "LOWERARM_R", rotations);
-  rigJoint("RightHand", "HAND_R", rotations);
+  rigJoint("RightUpperArm", rotations);
+  rigJoint("RightLowerArm", rotations);
+  rigJoint("RightHand", rotations);
 
   //         rigJoint("LeftShoulder", "UPPERARM_L", rotations);
-  rigJoint("LeftUpperArm", "UPPERARM_L", rotations);
-  rigJoint("LeftLowerArm", "LOWERARM_L", rotations);
-  rigJoint("LeftHand", "HAND_L", rotations);
+  rigJoint("LeftUpperArm", rotations);
+  rigJoint("LeftLowerArm", rotations);
+  rigJoint("LeftHand", rotations);
 
   // rigJoint("LeftUpperLeg", "THIGH_L", rotations);
   // rigJoint("LeftLowerLeg", "CALF_L", rotations);
@@ -142,7 +135,7 @@ const rigCharacter = (vrm, rotations) => {
   // rigJoint("RightToes", "TOES_01_R", rotations);
 };
 
-// Get access to the webcam //
+//* GET ACCESS TO WEBCAM *//
 let Stream,
   checkStream,
   videoObj = document.querySelector(".input_video");
@@ -190,7 +183,7 @@ const handleStream = stream => {
 
 getStream();
 
-// Mediapipe Holistic //
+//* SETUP MEDIAPIPE HOLISTIC *//
 let holistic;
 async function initHolistic() {
   holistic = new Holistic({
@@ -205,15 +198,15 @@ async function initHolistic() {
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7
   });
-  console.log(holistic);
   //holistic has callback function
   holistic.onResults(results => {
     console.log(results);
   });
 }
+initHolistic()
 
 async function predict() {
-  if (holistic) {
+  if (holistic && videoObj) {
     await holistic.send({ image: videoObj });
   }
   requestAnimationFrame(predict);
