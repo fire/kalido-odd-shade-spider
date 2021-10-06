@@ -188,7 +188,7 @@ let holistic;
 async function initHolistic() {
   holistic = new Holistic({
     locateFile: file => {
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4/${file}`;
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1632785079/${file}`;
     }
   });
 
