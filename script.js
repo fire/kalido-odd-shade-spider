@@ -13,12 +13,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
 // camera
-const orbitCamera = new THREE.PerspectiveCamera(
-  35,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+const orbitCamera = new THREE.PerspectiveCamera(35,window.innerWidth / window.innerHeight,0.1,1000);
 orbitCamera.position.set(0.0, 1.4, 0.7);
 
 // controls
@@ -292,12 +287,14 @@ async function initHolistic() {
     minTrackingConfidence: 0.7
   });
   //holistic has callback function
-  holistic.onResults(results => {
-    //animate model
-    animateVRM(currentVrm, results);
-    //draw landmark guides
-    drawResults(results)
-  });
+  holistic.onResults(onResults);
+}
+
+const onResults = (results) => {
+  //animate model
+  animateVRM(currentVrm, results);
+  //draw landmark guides
+  drawResults(results)
 }
 
 const drawResults = (results) => {
