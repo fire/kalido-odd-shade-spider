@@ -83,7 +83,7 @@ const rigRotation = (
   name,
   rotation = { x: 0, y: 0, z: 0 },
   dampener = 1,
-  lerp = 0.4
+  lerp = 0.3
 ) => {
   if (!currentVrm) {
     //return early if character not loaded
@@ -274,57 +274,10 @@ const animateVRM = (vrm, results) => {
   }
 };
 
-//* GET ACCESS TO WEBCAM *//
-let Stream,
-  checkStream,
-  videoObj = document.querySelector(".input_video"),
-  guideCanvas = document.querySelector('canvas.guides')
-
-const getStream = () => {
-  const constraints = {
-    video: {
-      facingMode: "user",
-      width: { min: 480, ideal: 640, max: 640 },
-      height: { min: 480, ideal: 480, max: 640 }
-    },
-    audio: false
-  };
-
-  // Get access to the camera!
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    if (!Stream || Stream.active === false) {
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(stream => {
-          handleStream(stream);
-        })
-        .catch(err => {
-          // alert('Please allow camera for facial tracking.');
-          setTimeout(() => {}, 1000);
-        });
-    }
-  }
-};
-
-const handleStream = stream => {
-  videoObj.srcObject = stream;
-
-  checkStream = setInterval(() => {
-    if (videoObj.readyState >= 3) {
-      videoObj.play();
-      videoObj.width = videoObj.videoWidth;
-      videoObj.height = videoObj.videoHeight;
-      //stop checking every half second
-      predict();
-      clearInterval(checkStream);
-    }
-  }, 500);
-};
-
-getStream();
-
 //* SETUP MEDIAPIPE HOLISTIC INSTANCE *//
-let holistic;
+let holistic,
+    videoElement = document.querySelector(".input_video"),
+    guideCanvas = document.querySelector('canvas.guides')
 async function initHolistic() {
   holistic = new Holistic({
     locateFile: file => {
@@ -342,49 +295,55 @@ async function initHolistic() {
   holistic.onResults(results => {
     //animate model
     animateVRM(currentVrm, results);
-    
-    //draw results
-    guideCanvas.width = videoObj.videoWidth;
-    guideCanvas.height = videoObj.videoHeight;
-    let canvasCtx = guideCanvas.getContext('2d');
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
-    //use mediapipe drawing functions
-    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-        color: "#00cff7",
-        lineWidth: 4
-      });
-      drawLandmarks(canvasCtx, results.poseLandmarks, {
-        color: "#ff0364",
-        lineWidth: 2
-      });
-      drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
-        color: "#C0C0C070",
-        lineWidth: 1
-      });
-      drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
-        color: "#eb1064",
-        lineWidth: 5
-      });
-      drawLandmarks(canvasCtx, results.leftHandLandmarks, {
-        color: "#00cff7",
-        lineWidth: 2
-      });
-      drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
-        color: "#22c3e3",
-        lineWidth: 5
-      });
-      drawLandmarks(canvasCtx, results.rightHandLandmarks, {
-        color: "#ff0364",
-        lineWidth: 2
-      });
+    //draw landmark guides
+    drawResults(results)
   });
 }
-initHolistic();
 
-async function predict() {
-  if (holistic && videoObj) {
-    await holistic.send({ image: videoObj });
-  }
-  requestAnimationFrame(predict);
+const drawResults = (results) => {
+  guideCanvas.width = videoElement.videoWidth;
+  guideCanvas.height = videoElement.videoHeight;
+  let canvasCtx = guideCanvas.getContext('2d');
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+  //use mediapipe drawing functions
+  drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+      color: "#00cff7",
+      lineWidth: 4
+    });
+    drawLandmarks(canvasCtx, results.poseLandmarks, {
+      color: "#ff0364",
+      lineWidth: 2
+    });
+    drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
+      color: "#C0C0C070",
+      lineWidth: 1
+    });
+    drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
+      color: "#eb1064",
+      lineWidth: 5
+    });
+    drawLandmarks(canvasCtx, results.leftHandLandmarks, {
+      color: "#00cff7",
+      lineWidth: 2
+    });
+    drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
+      color: "#22c3e3",
+      lineWidth: 5
+    });
+    drawLandmarks(canvasCtx, results.rightHandLandmarks, {
+      color: "#ff0364",
+      lineWidth: 2
+    });
 }
+initHolistic();
+//use Mediapipe utils to get camera
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    await holistic.send({image: videoElement});
+  },
+  width: 1280,
+  height: 720
+});
+camera.start();
+
