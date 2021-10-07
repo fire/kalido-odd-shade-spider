@@ -56,7 +56,7 @@ const loader = new THREE.GLTFLoader();
 loader.crossOrigin = "anonymous";
 //import model from URL
 loader.load(
-  "https://cdn.glitch.me/da3ef98f-b816-4270-a371-6d7912e2a554%2F9e943a97-44ea-4946-bbfb-32d13f509880_AliciaSolid.vrm?v=1633366694935",
+  "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
 
   gltf => {
     THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
