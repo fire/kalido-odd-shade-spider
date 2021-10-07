@@ -105,55 +105,48 @@ const rigCharacter = (vrm, results) => {
   const poseLandmarks = results.poseLandmarks
   const leftHandLandmarks = results.leftHandLandmarks 
   const rightHandLandmarks = results.rightHandLandmarks
+  let riggedPose,riggedLeftHand,riggedRightHand,riggedFace
   
   if(poseLandmarks && pose3DLandmarks){
-    let riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
+    riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
     // console.log(riggedPose)
     rigRotation("Hips", riggedPose.Hips.rotation, .7);
-    rigRotation("Chest", riggedPose.Spine, .2);
-    rigRotation("Spine", riggedPose.Spine, .2);
+    rigRotation("Chest", riggedPose.Spine, .25);
+    rigRotation("Spine", riggedPose.Spine, .45);
     
     rigRotation("RightUpperArm", riggedPose.RightUpperArm);
     rigRotation("RightLowerArm", riggedPose.RightLowerArm);
     rigRotation("LeftUpperArm", riggedPose.LeftUpperArm);
     rigRotation("LeftLowerArm", riggedPose.LeftLowerArm);
-    rigRotation("RightHand", riggedPose.RightHand);
-    rigRotation("LeftHand", riggedPose.LeftHand);
+    
+    
     
     rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg);
     rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg);
     rigRotation("RightUpperLeg", riggedPose.RightUpperLeg);
     rigRotation("RightLowerLeg", riggedPose.RightLowerLeg);
-
-
+  }
+  
+  if(leftHandLandmarks){
+    riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks,"Left")
+    rigRotation("LeftHand", {
+      //combine pose rotation Z and hand rotation X Y
+      z:riggedPose.LeftHand.z,
+      y:riggedLeftHand.LeftWrist.y,
+      z:riggedLeftHand.LeftWrist.z
+    });
   }
 
-  //unsure if NECK_01 or HEAD_01
-  // rigRotation("Neck", rotations);
+  if(rightHandLandmarks){
+    riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks,"Right")
+    rigRotation("RightHand", {
+      //combine pose rotation Z and hand rotation X Y
+      z:riggedPose.RightHand.z,
+      y:riggedRightHand.RightWrist.y,
+      z:riggedRightHand.RightWrist.z
+    });
+  }
 
-  //unsure of order Spine order
-  // rigRotation("UpperChest", "SPINE_03", rotations);
-  // rigRotation("Chest", "SPINE_02", rotations);
-  // rigRotation("Spine", "SPINE_01", rotations);
-
-  // rigRotation("Hips", "PELVIS", rotations);
-
-  // unsure if shoulder joints need to be updated
-  //         rigRotation("RightShoulder", "UPPERARM_L", rotations);
-
-
-  //         rigRotation("LeftShoulder", "UPPERARM_L", rotations);
- 
-
-  // rigRotation("LeftUpperLeg", "THIGH_L", rotations);
-  // rigRotation("LeftLowerLeg", "CALF_L", rotations);
-  // rigRotation("LeftFoot", "UPPERARM_L", rotations);
-  // rigRotation("LeftToes", "UPPERARM_L", rotations);
-
-  // rigRotation("RightUpperLeg", "THIGH_R", rotations);
-  // rigRotation("RightLowerLeg", "CALF_R", rotations);
-  // rigRotation("RightFoot", "ANKLE_R", rotations);
-  // rigRotation("RightToes", "TOES_01_R", rotations);
 };
 
 //* GET ACCESS TO WEBCAM *//
