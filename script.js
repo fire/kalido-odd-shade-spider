@@ -77,7 +77,7 @@ loader.load(
 
 
 
-const rigJoint = (name, rotation) => {
+const rigRotation = (name, rotation={x:0,y:0,z:0}) => {
   if (!currentVrm) {
     //return early if character not loaded
     return;
@@ -91,9 +91,8 @@ const rigJoint = (name, rotation) => {
   }
 
   let euler = new THREE.Euler(rotation.x, rotation.y, rotation.z);
-  let quaternion = new THREE.Quaternion.setFromEuler(euler);
-  quaternion.slerpQuaternions(quaternion, Part.quaternion); //interpolate before copying rotation
-  Part.quaternion.copy(quaternion);
+  let quaternion = new THREE.Quaternion().setFromEuler(euler);
+  Part.quaternion.slerp(quaternion,0.3) //interpolation easing
 };
 
 const rigCharacter = (vrm, results) => {
@@ -109,42 +108,50 @@ const rigCharacter = (vrm, results) => {
   
   if(poseLandmarks && pose3DLandmarks){
     let riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
-    rigJoint("RightUpperArm", riggedPose.RightUpperArm);
-    rigJoint("RightLowerArm", riggedPose.RightUpperArm);
-    rigJoint("LeftUpperArm", riggedPose.RightUpperArm);
-    rigJoint("LeftLowerArm", riggedPose.RightUpperArm);
-    rigJoint("RightHand", riggedPose.RightUpperArm);
-    rigJoint("LeftHand", riggedPose.RightUpperArm);
+    console.log(riggedPose)
+    rigRotation("Hips", riggedPose.Hips);
+    
+    rigRotation("RightUpperArm", riggedPose.RightUpperArm);
+    rigRotation("RightLowerArm", riggedPose.RightLowerArm);
+    rigRotation("LeftUpperArm", riggedPose.LeftUpperArm);
+    rigRotation("LeftLowerArm", riggedPose.LeftLowerArm);
+    rigRotation("RightHand", riggedPose.RightHand);
+    rigRotation("LeftHand", riggedPose.LeftHand);
+    
+    rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg);
+    rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg);
+    rigRotation("RightUpperLeg", riggedPose.RightUpperLeg);
+    rigRotation("RightLowerLeg", riggedPose.RightLowerLeg);
 
 
   }
 
   //unsure if NECK_01 or HEAD_01
-  rigJoint("Neck", rotations);
+  // rigRotation("Neck", rotations);
 
   //unsure of order Spine order
-  // rigJoint("UpperChest", "SPINE_03", rotations);
-  // rigJoint("Chest", "SPINE_02", rotations);
-  // rigJoint("Spine", "SPINE_01", rotations);
+  // rigRotation("UpperChest", "SPINE_03", rotations);
+  // rigRotation("Chest", "SPINE_02", rotations);
+  // rigRotation("Spine", "SPINE_01", rotations);
 
-  // rigJoint("Hips", "PELVIS", rotations);
+  // rigRotation("Hips", "PELVIS", rotations);
 
   // unsure if shoulder joints need to be updated
-  //         rigJoint("RightShoulder", "UPPERARM_L", rotations);
+  //         rigRotation("RightShoulder", "UPPERARM_L", rotations);
 
 
-  //         rigJoint("LeftShoulder", "UPPERARM_L", rotations);
+  //         rigRotation("LeftShoulder", "UPPERARM_L", rotations);
  
 
-  // rigJoint("LeftUpperLeg", "THIGH_L", rotations);
-  // rigJoint("LeftLowerLeg", "CALF_L", rotations);
-  // rigJoint("LeftFoot", "UPPERARM_L", rotations);
-  // rigJoint("LeftToes", "UPPERARM_L", rotations);
+  // rigRotation("LeftUpperLeg", "THIGH_L", rotations);
+  // rigRotation("LeftLowerLeg", "CALF_L", rotations);
+  // rigRotation("LeftFoot", "UPPERARM_L", rotations);
+  // rigRotation("LeftToes", "UPPERARM_L", rotations);
 
-  // rigJoint("RightUpperLeg", "THIGH_R", rotations);
-  // rigJoint("RightLowerLeg", "CALF_R", rotations);
-  // rigJoint("RightFoot", "ANKLE_R", rotations);
-  // rigJoint("RightToes", "TOES_01_R", rotations);
+  // rigRotation("RightUpperLeg", "THIGH_R", rotations);
+  // rigRotation("RightLowerLeg", "CALF_R", rotations);
+  // rigRotation("RightFoot", "ANKLE_R", rotations);
+  // rigRotation("RightToes", "TOES_01_R", rotations);
 };
 
 //* GET ACCESS TO WEBCAM *//
