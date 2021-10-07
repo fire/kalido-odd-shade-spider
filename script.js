@@ -31,7 +31,7 @@ light.position.set(1.0, 1.0, 1.0).normalize();
 // helpers
 const gridHelper = new THREE.GridHelper(10, 10);
 const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper,gridHelper,light);
+scene.add(axesHelper, gridHelper, light);
 
 // Main Render Loop
 const clock = new THREE.Clock();
@@ -75,9 +75,7 @@ loader.load(
   error => console.error(error)
 );
 
-
-
-const rigRotation = (name, rotation={x:0,y:0,z:0}, dampener=1) => {
+const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1) => {
   if (!currentVrm) {
     //return early if character not loaded
     return;
@@ -90,61 +88,92 @@ const rigRotation = (name, rotation={x:0,y:0,z:0}, dampener=1) => {
     return;
   }
 
-  let euler = new THREE.Euler(rotation.x*dampener, rotation.y*dampener, rotation.z*dampener);
+  let euler = new THREE.Euler(
+    rotation.x * dampener,
+    rotation.y * dampener,
+    rotation.z * dampener
+  );
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  Part.quaternion.slerp(quaternion,0.3) //interpolation easing
+  Part.quaternion.slerp(quaternion, 0.3); //interpolation easing
+};
+
+const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1) => {
+  if (!currentVrm) {
+    //return early if character not loaded
+    return;
+  }
+  const Part = currentVrm.humanoid.getBoneNode(
+    THREE.VRMSchema.HumanoidBoneName[name]
+  );
+  if (!Part) {
+    //return early if part doesn't exist
+    return;
+  }
+  let vector = new THREE.Vector3(
+    position.x * dampener,
+    position.y * dampener,
+    position.z * dampener
+  );
+  Part.position.lerp(vector, 0.1);
 };
 
 const rigCharacter = (vrm, results) => {
   if (!vrm) {
     return;
   }
-  
-  const faceLandmarks = results.faceLandmarks
-  const pose3DLandmarks = results.ea
-  const poseLandmarks = results.poseLandmarks
-  const leftHandLandmarks = results.leftHandLandmarks 
-  const rightHandLandmarks = results.rightHandLandmarks
-  let riggedPose,riggedLeftHand,riggedRightHand,riggedFace
-  
-  if(poseLandmarks && pose3DLandmarks){
-    riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
+
+  const faceLandmarks = results.faceLandmarks;
+  const pose3DLandmarks = results.ea;
+  const poseLandmarks = results.poseLandmarks;
+  const leftHandLandmarks = results.leftHandLandmarks;
+  const rightHandLandmarks = results.rightHandLandmarks;
+  let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
+
+  if (poseLandmarks && pose3DLandmarks) {
+    riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, poseLandmarks, {
+      runtime: "mediapipe"
+    });
     // console.log(riggedPose)
-    rigRotation("Hips", riggedPose.Hips.rotation, .7);
-    rigRotation("Chest", riggedPose.Spine, .25);
-    rigRotation("Spine", riggedPose.Spine, .45);
+    rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
+    rigPosition("Hips", {
+      x:-riggedPose.Hips.position.x, //reverse direction
+      y:riggedPose.Hips.position.y + 1, //add a bit of height
+      z:-riggedPose.Hips.position.z // reverse direction
+    });
     
+    rigRotation("Chest", riggedPose.Spine, 0.25);
+    rigRotation("Spine", riggedPose.Spine, 0.45);
+
     rigRotation("RightUpperArm", riggedPose.RightUpperArm);
     rigRotation("RightLowerArm", riggedPose.RightLowerArm);
     rigRotation("LeftUpperArm", riggedPose.LeftUpperArm);
     rigRotation("LeftLowerArm", riggedPose.LeftLowerArm);
-    
+
     rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg);
     rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg);
     rigRotation("RightUpperLeg", riggedPose.RightUpperLeg);
     rigRotation("RightLowerLeg", riggedPose.RightLowerLeg);
   }
-  
-  if(leftHandLandmarks){
-    riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks,"Left")
+
+  if (leftHandLandmarks) {
+    riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
     rigRotation("LeftHand", {
       //combine pose rotation Z and hand rotation X Y
-      z:riggedPose.LeftHand.z,
-      y:riggedLeftHand.LeftWrist.y,
-      z:riggedLeftHand.LeftWrist.z
+      z: riggedPose.LeftHand.z,
+      y: riggedLeftHand.LeftWrist.y,
+      z: riggedLeftHand.LeftWrist.z
     });
   }
 
-  if(rightHandLandmarks){
-    riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks,"Right")
+  if (rightHandLandmarks) {
+    riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
     rigRotation("RightHand", {
       //combine pose rotation Z and hand rotation X Y
-      z:riggedPose.RightHand.z,
-      y:riggedRightHand.RightWrist.y,
-      z:riggedRightHand.RightWrist.z
+      z: riggedPose.RightHand.z,
+      y: riggedRightHand.RightWrist.y,
+      z: riggedRightHand.RightWrist.z
     });
   }
-
 };
 
 //* GET ACCESS TO WEBCAM *//
@@ -212,10 +241,10 @@ async function initHolistic() {
   });
   //holistic has callback function
   holistic.onResults(results => {
-    rigCharacter(currentVrm,results);
+    rigCharacter(currentVrm, results);
   });
 }
-initHolistic()
+initHolistic();
 
 async function predict() {
   if (holistic && videoObj) {
