@@ -1,6 +1,7 @@
 //Import Helper Functions from Kalidokit
 const remap = Kalidokit.Utils.remap;
 const clamp = Kalidokit.Utils.clamp;
+const lerp = Kalidokit.Vector.lerp;
 
 //* THREEJS WORLD SETUP *//
 let currentVrm;
@@ -142,8 +143,10 @@ const animateVRM = (vrm, results) => {
 
   //Identify Key Landmarks
   const faceLandmarks = results.faceLandmarks;
-  const pose3DLandmarks = results.ea; // Pose 3D Landmarks are with respect to Hip distance in meters
-  const pose2DLandmarks = results.poseLandmarks; // Pose 2D landmarks are with respect to videoWidth and videoHeight
+  // Pose 3D Landmarks are with respect to Hip distance in meters
+  const pose3DLandmarks = results.ea;
+  // Pose 2D landmarks are with respect to videoWidth and videoHeight
+  const pose2DLandmarks = results.poseLandmarks;
   //Hand landmarks may be reversed
   const leftHandLandmarks = results.rightHandLandmarks;
   const rightHandLandmarks = results.leftHandLandmarks;
@@ -160,10 +163,13 @@ const animateVRM = (vrm, results) => {
 
     // Warning! Joy blendshape changes both Blink and Mouth behaviors
     //Calc Joy value based on mouth X + eye closed ratio
-    let joy = 0
-    joy = remap(riggedFace.mouth.x - 0.4, 0, 0.5);
-    // joy *= (riggedFace.eye.l !== riggedFace.eye.r) ? 0 : 1 - remap(riggedFace.eye.l, 0.2, 0.8);
-    // console.log(riggedFace.mouth.shape.I,joy)
+    let joy = 0;
+    // joy = remap(riggedFace.mouth.x - 0.4, 0, 0.5);
+    // joy *=
+    //   riggedFace.eye.l !== riggedFace.eye.r
+    //     ? 0
+    //     : (1 - remap(riggedFace.eye.l, 0.2, 0.8));
+    console.log(riggedFace);
 
     //handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
@@ -182,7 +188,6 @@ const animateVRM = (vrm, results) => {
       Blendshape.setValue(PresetName.BlinkL, 0);
       Blendshape.setValue(PresetName.BlinkR, 0);
     }
-    
 
     Blendshape.setValue(PresetName.I, riggedFace.mouth.shape.I - joy);
     Blendshape.setValue(PresetName.A, riggedFace.mouth.shape.A - joy);
@@ -190,7 +195,7 @@ const animateVRM = (vrm, results) => {
     Blendshape.setValue(PresetName.O, riggedFace.mouth.shape.O - joy);
     Blendshape.setValue(PresetName.U, riggedFace.mouth.shape.U - joy);
 
-    // Blendshape.setValue(PresetName.Joy, joy);
+    Blendshape.setValue(PresetName.Joy, joy);
 
     //PUPILS
     //lookat method accepts Three.euler objects
