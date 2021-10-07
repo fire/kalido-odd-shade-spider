@@ -155,7 +155,10 @@ const animateVRM = (vrm, results) => {
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
 
-    //handle Wink
+    // Mediapipe Holistic currently doesn't support eye tracking atm
+    // This section will rig blinks when it does.
+    
+    // handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
       riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
       riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
