@@ -13,6 +13,7 @@
       src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1632785079/holistic.js"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 
     <!--     Vector Class for 6D conversion -->
     <script src="kalidokit.umd.js"></script>
@@ -35,7 +36,10 @@
   </head>
 
   <body>
-    <video class="input_video" width="1280px" height="720px"></video>
+    <div class="preview">
+      <video class="input_video" width="1280px" height="720px"></video>
+      <canvas class="guides"></canvas>
+    </div>
     <script src="script.js"></script>
   </body>
 </html>

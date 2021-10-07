@@ -242,19 +242,13 @@ const animateVRM = (vrm, results) => {
     rigRotation("LeftIndexIntermediate", riggedLeftHand.LeftIndexIntermediate);
     rigRotation("LeftIndexDistal", riggedLeftHand.LeftIndexDistal);
     rigRotation("LeftMiddleProximal", riggedLeftHand.LeftMiddleProximal);
-    rigRotation(
-      "LeftMiddleIntermediate",
-      riggedLeftHand.LeftMiddleIntermediate
-    );
+    rigRotation("LeftMiddleIntermediate", riggedLeftHand.LeftMiddleIntermediate);
     rigRotation("LeftMiddleDistal", riggedLeftHand.LeftMiddleDistal);
     rigRotation("LeftThumbProximal", riggedLeftHand.LeftThumbProximal);
     rigRotation("LeftThumbIntermediate", riggedLeftHand.LeftThumbIntermediate);
     rigRotation("LeftThumbDistal", riggedLeftHand.LeftThumbDistal);
     rigRotation("LeftLittleProximal", riggedLeftHand.LeftLittleProximal);
-    rigRotation(
-      "LeftLittleIntermediate",
-      riggedLeftHand.LeftLittleIntermediate
-    );
+    rigRotation("LeftLittleIntermediate", riggedLeftHand.LeftLittleIntermediate);
     rigRotation("LeftLittleDistal", riggedLeftHand.LeftLittleDistal);
   }
   if (rightHandLandmarks) {
@@ -269,28 +263,16 @@ const animateVRM = (vrm, results) => {
     rigRotation("RightRingIntermediate", riggedRightHand.RightRingIntermediate);
     rigRotation("RightRingDistal", riggedRightHand.RightRingDistal);
     rigRotation("RightIndexProximal", riggedRightHand.RightIndexProximal);
-    rigRotation(
-      "RightIndexIntermediate",
-      riggedRightHand.RightIndexIntermediate
-    );
+    rigRotation("RightIndexIntermediate",riggedRightHand.RightIndexIntermediate);
     rigRotation("RightIndexDistal", riggedRightHand.RightIndexDistal);
     rigRotation("RightMiddleProximal", riggedRightHand.RightMiddleProximal);
-    rigRotation(
-      "RightMiddleIntermediate",
-      riggedRightHand.RightMiddleIntermediate
-    );
+    rigRotation("RightMiddleIntermediate", riggedRightHand.RightMiddleIntermediate);
     rigRotation("RightMiddleDistal", riggedRightHand.RightMiddleDistal);
     rigRotation("RightThumbProximal", riggedRightHand.RightThumbProximal);
-    rigRotation(
-      "RightThumbIntermediate",
-      riggedRightHand.RightThumbIntermediate
-    );
+    rigRotation("RightThumbIntermediate", riggedRightHand.RightThumbIntermediate);
     rigRotation("RightThumbDistal", riggedRightHand.RightThumbDistal);
     rigRotation("RightLittleProximal", riggedRightHand.RightLittleProximal);
-    rigRotation(
-      "RightLittleIntermediate",
-      riggedRightHand.RightLittleIntermediate
-    );
+    rigRotation("RightLittleIntermediate", riggedRightHand.RightLittleIntermediate);
     rigRotation("RightLittleDistal", riggedRightHand.RightLittleDistal);
   }
 };
@@ -298,7 +280,9 @@ const animateVRM = (vrm, results) => {
 //* GET ACCESS TO WEBCAM *//
 let Stream,
   checkStream,
-  videoObj = document.querySelector(".input_video");
+  videoObj = document.querySelector(".input_video"),
+  guideCanvas = document.querySelector('canvas.guide'),
+  canvasCtx = guideCanvas.getContext('2d');
 
 const getStream = () => {
   const constraints = {
@@ -360,7 +344,14 @@ async function initHolistic() {
   });
   //holistic has callback function
   holistic.onResults(results => {
+    //draw results
+    guideCanvas.width = guideCanvas.videoWidth;
+    guideCanvas.height = guideCanvas.videoHeight;
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    //animate model
     animateVRM(currentVrm, results);
+    
   });
 }
 initHolistic();
