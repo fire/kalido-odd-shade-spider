@@ -130,7 +130,7 @@ const animateVRM = (vrm, results) => {
   const faceLandmarks = results.faceLandmarks;
   const pose3DLandmarks = results.ea; // Pose 3D Landmarks are with respect to Hip distance in meters
   const pose2DLandmarks = results.poseLandmarks; // Pose 2D landmarks are with respect to videoWidth and videoHeight
-  //hand landmarks could be reversed left vs right
+  //Hand landmarks may be reversed
   const leftHandLandmarks = results.rightHandLandmarks; 
   const rightHandLandmarks = results.leftHandLandmarks;
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
