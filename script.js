@@ -154,48 +154,35 @@ const animateVRM = (vrm, results) => {
 
   //Animate Face
   if (faceLandmarks) {
-    riggedFace = Kalidokit.Face.solve(faceLandmarks);
+    riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:true});
     rigRotation("Neck", riggedFace.head, 0.7);
 
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
-
-    // Warning! Joy blendshape changes both Blink and Mouth behaviors
-    //Calc Joy value based on mouth X + eye closed ratio
-    let joy = 0;
-    // joy = remap(riggedFace.mouth.x - 0.4, 0, 0.5);
-    // joy *=
-    //   riggedFace.eye.l !== riggedFace.eye.r
-    //     ? 0
-    //     : (1 - remap(riggedFace.eye.l, 0.2, 0.8));
-    console.log(riggedFace);
+    
+    //lerp blendshapes
+    riggedFace.eye.l = lerp()
 
     //handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
       riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
       riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
-      //Joy blendshape clashes with BlinkL and BlinkR blenshapes. Reset Joy
-      joy = 0;
-
       Blendshape.setValue(PresetName.Blink, 0);
       Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
       Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
     } else {
       const stabilizedBlink = clamp(1 - riggedFace.eye.l, 0, 1);
-      //Subtract joy values from Blink values to avoid clipping
-      Blendshape.setValue(PresetName.Blink, stabilizedBlink - joy);
+      Blendshape.setValue(PresetName.Blink, stabilizedBlink);
       Blendshape.setValue(PresetName.BlinkL, 0);
       Blendshape.setValue(PresetName.BlinkR, 0);
     }
 
-    Blendshape.setValue(PresetName.I, riggedFace.mouth.shape.I - joy);
-    Blendshape.setValue(PresetName.A, riggedFace.mouth.shape.A - joy);
-    Blendshape.setValue(PresetName.E, riggedFace.mouth.shape.E - joy);
-    Blendshape.setValue(PresetName.O, riggedFace.mouth.shape.O - joy);
-    Blendshape.setValue(PresetName.U, riggedFace.mouth.shape.U - joy);
-
-    Blendshape.setValue(PresetName.Joy, joy);
+    Blendshape.setValue(PresetName.I, riggedFace.mouth.shape.I);
+    Blendshape.setValue(PresetName.A, riggedFace.mouth.shape.A);
+    Blendshape.setValue(PresetName.E, riggedFace.mouth.shape.E);
+    Blendshape.setValue(PresetName.O, riggedFace.mouth.shape.O);
+    Blendshape.setValue(PresetName.U, riggedFace.mouth.shape.U);
 
     //PUPILS
     //lookat method accepts Three.euler objects
