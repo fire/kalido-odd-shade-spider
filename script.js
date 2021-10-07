@@ -109,7 +109,9 @@ const rigCharacter = (vrm, results) => {
   if(poseLandmarks && pose3DLandmarks){
     let riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
     console.log(riggedPose)
-    rigRotation("Hips", riggedPose.Hips);
+    rigRotation("Hips", riggedPose.Hips.rotation);
+    // rigRotation("Chest", riggedPose.Spine);
+    // rigRotation("Spine",riggedPose.Spine);
     
     rigRotation("RightUpperArm", riggedPose.RightUpperArm);
     rigRotation("RightLowerArm", riggedPose.RightLowerArm);
