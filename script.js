@@ -135,6 +135,12 @@ const animateVRM = (vrm, results) => {
   const rightHandLandmarks = results.leftHandLandmarks;
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
+  //Animate Face
+  if(faceLandmarks){
+    riggedFace = Kalidokit.Face.solve(faceLandmarks)
+    rigRotation("Neck", riggedFace.head, .7);
+  }
+  
   //Animate Pose
   if (pose2DLandmarks && pose3DLandmarks) {
     riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
@@ -165,7 +171,6 @@ const animateVRM = (vrm, results) => {
   //Animate Hands
   if (leftHandLandmarks) {
     riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
-    console.log(riggedLeftHand)
     rigRotation("LeftHand", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.LeftHand.z,
@@ -262,7 +267,7 @@ const handleStream = stream => {
 
 getStream();
 
-//* SETUP MEDIAPIPE HOLISTIC *//
+//* SETUP MEDIAPIPE HOLISTIC INSTANCE *//
 let holistic;
 async function initHolistic() {
   holistic = new Holistic({
