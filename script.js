@@ -281,8 +281,7 @@ const animateVRM = (vrm, results) => {
 let Stream,
   checkStream,
   videoObj = document.querySelector(".input_video"),
-  guideCanvas = document.querySelector('canvas.guide'),
-  canvasCtx = guideCanvas.getContext('2d');
+  guideCanvas = document.querySelector('canvas.guides')
 
 const getStream = () => {
   const constraints = {
@@ -344,14 +343,44 @@ async function initHolistic() {
   });
   //holistic has callback function
   holistic.onResults(results => {
-    //draw results
-    guideCanvas.width = guideCanvas.videoWidth;
-    guideCanvas.height = guideCanvas.videoHeight;
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasEl.width, canvasEl.height);
     //animate model
     animateVRM(currentVrm, results);
     
+    //draw results
+    guideCanvas.width = videoObj.videoWidth;
+    guideCanvas.height = videoObj.videoHeight;
+    let canvasCtx = guideCanvas.getContext('2d');
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+    //use mediapipe drawing functions
+    drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+        color: "#00cff7",
+        lineWidth: 4
+      });
+      drawLandmarks(canvasCtx, results.poseLandmarks, {
+        color: "#ff0364",
+        lineWidth: 2
+      });
+      drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
+        color: "#C0C0C070",
+        lineWidth: 1
+      });
+      drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
+        color: "#eb1064",
+        lineWidth: 5
+      });
+      drawLandmarks(canvasCtx, results.leftHandLandmarks, {
+        color: "#00cff7",
+        lineWidth: 2
+      });
+      drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
+        color: "#22c3e3",
+        lineWidth: 5
+      });
+      drawLandmarks(canvasCtx, results.rightHandLandmarks, {
+        color: "#ff0364",
+        lineWidth: 2
+      });
   });
 }
 initHolistic();

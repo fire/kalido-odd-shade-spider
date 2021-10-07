@@ -13,17 +13,25 @@
       src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1632785079/holistic.js"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
 
     <!--     Vector Class for 6D conversion -->
     <script src="kalidokit.umd.js"></script>
     <style>
+      .preview {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        transform: scale(-1, 1);
+        overflow:hidden;
+        border-radius:8px;
+      }
       video {
-        position:absolute;
-        top:16px;left:16px;
-        max-width:200px;
-        height:auto;
-        transform:scale(-1,1);
+        max-width: 200px;
+        height: auto;
       }
       body {
         margin: 0;
@@ -31,6 +39,14 @@
       }
       canvas {
         display: block;
+      }
+      .guides{
+        position:absolute;
+        top:0;
+        left:0;
+        height:auto;
+        width:100%;
+        z-index:1;
       }
     </style>
   </head>
