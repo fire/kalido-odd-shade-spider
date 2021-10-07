@@ -77,7 +77,7 @@ loader.load(
 
 
 
-const rigRotation = (name, rotation={x:0,y:0,z:0}) => {
+const rigRotation = (name, rotation={x:0,y:0,z:0}, dampener=1) => {
   if (!currentVrm) {
     //return early if character not loaded
     return;
@@ -90,7 +90,7 @@ const rigRotation = (name, rotation={x:0,y:0,z:0}) => {
     return;
   }
 
-  let euler = new THREE.Euler(rotation.x, rotation.y, rotation.z);
+  let euler = new THREE.Euler(rotation.x*dampener, rotation.y*dampener, rotation.z*dampener);
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
   Part.quaternion.slerp(quaternion,0.3) //interpolation easing
 };
@@ -108,10 +108,10 @@ const rigCharacter = (vrm, results) => {
   
   if(poseLandmarks && pose3DLandmarks){
     let riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
-    console.log(riggedPose)
-    rigRotation("Hips", riggedPose.Hips.rotation);
-    // rigRotation("Chest", riggedPose.Spine);
-    // rigRotation("Spine",riggedPose.Spine);
+    // console.log(riggedPose)
+    rigRotation("Hips", riggedPose.Hips.rotation, .7);
+    rigRotation("Chest", riggedPose.Spine, .2);
+    rigRotation("Spine", riggedPose.Spine, .2);
     
     rigRotation("RightUpperArm", riggedPose.RightUpperArm);
     rigRotation("RightLowerArm", riggedPose.RightLowerArm);
