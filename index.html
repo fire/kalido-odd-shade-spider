@@ -6,9 +6,9 @@
     <script src="https://unpkg.com/three@0.133.0/build/three.js"></script>
     <script src="https://unpkg.com/three@0.133.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://unpkg.com/three@0.133.0/examples/js/controls/OrbitControls.js"></script>
-    <!--     VRM Renderer -->
+    <!--     VRM Plugin -->
     <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
-    <!--     Mediapipe or TensorflowJS ML -->
+    <!--     Mediapipe or Tensorflow.js -->
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1632785079/holistic.js"
       crossorigin="anonymous"
@@ -17,8 +17,7 @@
       src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
       crossorigin="anonymous"
     ></script>
-
-    <!--     Vector Class for 6D conversion -->
+    <!--     Kalidokit Kinematic Solver -->
     <script src="kalidokit.umd.js"></script>
     <style>
       @font-face {
@@ -39,26 +38,26 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
-      a{
+      a,a:visited,a:link{
         text-decoration:none;
         color:white;
       }
       .preview {
         display: flex;
         position: absolute;
-        bottom: 16px;
+        top: 16px;
         right: 16px;
         transform: scale(-1, 1);
         overflow: hidden;
         border-radius: 8px;
       }
       video {
-        max-width: 200px;
+        max-width: 400px;
         height: auto;
       }
       body {
         margin: 0;
-        background: #222;
+        background: #9c577e;
       }
       canvas {
         display: block;
