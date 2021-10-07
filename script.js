@@ -14,12 +14,12 @@ const orbitCamera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-orbitCamera.position.set(0.0, 1.3, 1.0);
+orbitCamera.position.set(0.0, 1.4, .7);
 
 // controls
 const orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
 orbitControls.screenSpacePanning = true;
-orbitControls.target.set(0.0, 1.3, 0.0);
+orbitControls.target.set(0.0, 1.4, 0.0);
 orbitControls.update();
 
 // scene
@@ -75,7 +75,7 @@ loader.load(
   error => console.error(error)
 );
 
-const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1) => {
+const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3) => {
   if (!currentVrm) {
     //return early if character not loaded
     return;
@@ -94,10 +94,10 @@ const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1) => {
     rotation.z * dampener
   );
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  Part.quaternion.slerp(quaternion, 0.3); //interpolation easing
+  Part.quaternion.slerp(quaternion, lerp); //interpolation easing
 };
 
-const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1) => {
+const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3) => {
   if (!currentVrm) {
     //return early if character not loaded
     return;
@@ -114,7 +114,7 @@ const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1) => {
     position.y * dampener,
     position.z * dampener
   );
-  Part.position.lerp(vector, 0.1);
+  Part.position.lerp(vector, lerp);
 };
 
 const rigCharacter = (vrm, results) => {
@@ -139,7 +139,7 @@ const rigCharacter = (vrm, results) => {
       x:-riggedPose.Hips.position.x, //reverse direction
       y:riggedPose.Hips.position.y + 1, //add a bit of height
       z:-riggedPose.Hips.position.z // reverse direction
-    });
+    },1,.07);
     
     rigRotation("Chest", riggedPose.Spine, 0.25);
     rigRotation("Spine", riggedPose.Spine, 0.45);
@@ -158,17 +158,18 @@ const rigCharacter = (vrm, results) => {
   if (leftHandLandmarks) {
     riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
     console.log(riggedLeftHand)
-    rigRotation("LeftHand", {
+    rigRotation("LeftWrist", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.LeftHand.z,
       y: riggedLeftHand.LeftWrist.y,
       x: riggedLeftHand.LeftWrist.x
     });
+    rigRotation("")
   }
 
   if (rightHandLandmarks) {
     riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
-    rigRotation("RightHand", {
+    rigRotation("RightWrist", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.RightHand.z,
       y: riggedRightHand.RightWrist.y,
