@@ -14,12 +14,12 @@ const orbitCamera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-orbitCamera.position.set(0.0, 1.0, 2.0);
+orbitCamera.position.set(0.0, 1.3, 1.0);
 
 // controls
 const orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
 orbitControls.screenSpacePanning = true;
-orbitControls.target.set(0.0, 1.0, 0.0);
+orbitControls.target.set(0.0, 1.3, 0.0);
 orbitControls.update();
 
 // scene
@@ -125,8 +125,8 @@ const rigCharacter = (vrm, results) => {
   const faceLandmarks = results.faceLandmarks;
   const pose3DLandmarks = results.ea;
   const poseLandmarks = results.poseLandmarks;
-  const leftHandLandmarks = results.leftHandLandmarks;
-  const rightHandLandmarks = results.rightHandLandmarks;
+  const leftHandLandmarks = results.rightHandLandmarks; //hand landmarks could be reversed left vs right
+  const rightHandLandmarks = results.leftHandLandmarks;
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
   if (poseLandmarks && pose3DLandmarks) {
