@@ -75,6 +75,7 @@ loader.load(
   error => console.error(error)
 );
 
+//Part Rotation Helper function
 const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3) => {
   if (!currentVrm) {
     //return early if character not loaded
@@ -97,6 +98,7 @@ const rigRotation = (name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3
   Part.quaternion.slerp(quaternion, lerp); //interpolation easing
 };
 
+//Part Position Helper Function
 const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3) => {
   if (!currentVrm) {
     //return early if character not loaded
@@ -117,20 +119,25 @@ const rigPosition = (name, position = { x: 0, y: 0, z: 0 }, dampener = 1,lerp=.3
   Part.position.lerp(vector, lerp);
 };
 
-const rigCharacter = (vrm, results) => {
+//VRM Character Animator
+const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
-
+  //Take the results from Holistic and animate character based on its Face, Pose, and Hand Keypoints.
+  
+  //Identify Key Landmarks
   const faceLandmarks = results.faceLandmarks;
-  const pose3DLandmarks = results.ea;
-  const poseLandmarks = results.poseLandmarks;
-  const leftHandLandmarks = results.rightHandLandmarks; //hand landmarks could be reversed left vs right
+  const pose3DLandmarks = results.ea; // Pose 3D Landmarks are with respect to Hip distance in meters
+  const pose2DLandmarks = results.poseLandmarks; // Pose 2D landmarks are with respect to videoWidth and videoHeight
+  //hand landmarks could be reversed left vs right
+  const leftHandLandmarks = results.rightHandLandmarks; 
   const rightHandLandmarks = results.leftHandLandmarks;
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
-  if (poseLandmarks && pose3DLandmarks) {
-    riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, poseLandmarks, {
+  //Animate Pose
+  if (pose2DLandmarks && pose3DLandmarks) {
+    riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
       runtime: "mediapipe"
     });
     // console.log(riggedPose)
@@ -155,26 +162,55 @@ const rigCharacter = (vrm, results) => {
     rigRotation("RightLowerLeg", riggedPose.RightLowerLeg);
   }
 
+  //Animate Hands
   if (leftHandLandmarks) {
     riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
     console.log(riggedLeftHand)
-    rigRotation("LeftWrist", {
+    rigRotation("LeftHand", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.LeftHand.z,
       y: riggedLeftHand.LeftWrist.y,
       x: riggedLeftHand.LeftWrist.x
     });
-    rigRotation("")
+    rigRotation("LeftRingProximal", riggedLeftHand.LeftRingProximal)
+    rigRotation("LeftRingIntermediate", riggedLeftHand.LeftRingIntermediate)
+    rigRotation("LeftRingDistal", riggedLeftHand.LeftRingDistal)
+    rigRotation("LeftIndexProximal", riggedLeftHand.LeftIndexProximal)
+    rigRotation("LeftIndexIntermediate", riggedLeftHand.LeftIndexIntermediate)
+    rigRotation("LeftIndexDistal", riggedLeftHand.LeftIndexDistal)
+    rigRotation("LeftMiddleProximal", riggedLeftHand.LeftMiddleProximal)
+    rigRotation("LeftMiddleIntermediate", riggedLeftHand.LeftMiddleIntermediate)
+    rigRotation("LeftMiddleDistal", riggedLeftHand.LeftMiddleDistal)
+    rigRotation("LeftThumbProximal", riggedLeftHand.LeftThumbProximal)
+    rigRotation("LeftThumbIntermediate", riggedLeftHand.LeftThumbIntermediate)
+    rigRotation("LeftThumbDistal", riggedLeftHand.LeftThumbDistal)
+    rigRotation("LeftLittleProximal", riggedLeftHand.LeftLittleProximal)
+    rigRotation("LeftLittleIntermediate", riggedLeftHand.LeftLittleIntermediate)
+    rigRotation("LeftLittleDistal", riggedLeftHand.LeftLittleDistal)
   }
-
   if (rightHandLandmarks) {
     riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
-    rigRotation("RightWrist", {
+    rigRotation("RightHand", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.RightHand.z,
       y: riggedRightHand.RightWrist.y,
       x: riggedRightHand.RightWrist.x
     });
+    rigRotation("RightRingProximal", riggedRightHand.RightRingProximal)
+    rigRotation("RightRingIntermediate", riggedRightHand.RightRingIntermediate)
+    rigRotation("RightRingDistal", riggedRightHand.RightRingDistal)
+    rigRotation("RightIndexProximal", riggedRightHand.RightIndexProximal)
+    rigRotation("RightIndexIntermediate", riggedRightHand.RightIndexIntermediate)
+    rigRotation("RightIndexDistal", riggedRightHand.RightIndexDistal)
+    rigRotation("RightMiddleProximal", riggedRightHand.RightMiddleProximal)
+    rigRotation("RightMiddleIntermediate", riggedRightHand.RightMiddleIntermediate)
+    rigRotation("RightMiddleDistal", riggedRightHand.RightMiddleDistal)
+    rigRotation("RightThumbProximal", riggedRightHand.RightThumbProximal)
+    rigRotation("RightThumbIntermediate", riggedRightHand.RightThumbIntermediate)
+    rigRotation("RightThumbDistal", riggedRightHand.RightThumbDistal)
+    rigRotation("RightLittleProximal", riggedRightHand.RightLittleProximal)
+    rigRotation("RightLittleIntermediate", riggedRightHand.RightLittleIntermediate)
+    rigRotation("RightLittleDistal", riggedRightHand.RightLittleDistal)
   }
 };
 
@@ -243,7 +279,7 @@ async function initHolistic() {
   });
   //holistic has callback function
   holistic.onResults(results => {
-    rigCharacter(currentVrm, results);
+    animateVRM(currentVrm, results);
   });
 }
 initHolistic();
