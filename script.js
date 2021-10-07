@@ -139,6 +139,58 @@ const animateVRM = (vrm, results) => {
   if(faceLandmarks){
     riggedFace = Kalidokit.Face.solve(faceLandmarks)
     rigRotation("Neck", riggedFace.head, .7);
+    
+    // Blendshapes and Preset Name Schema
+    const Blendshape = currentVrm.blendShapeProxy
+    const PresetName = VRMSchema.BlendShapePresetName
+    
+    let eye = riggedFace.eye
+    
+    let joy = 0
+    
+    if(get(allowSmile)){
+      // Warning! Joy blendshape changes both Blink and Mouth behaviors
+      //Calc Joy value based on mouth X + eye closed ratio
+      joy = remap(riggedFace.mouth.x-.4,0,.5)
+      joy *= eye.l !== eye.r ? 0 : (1-remap(eye.l,.2,.8))
+    }
+
+    //handle Wink
+    if(eye.l !== eye.r){
+      eye.l = clamp(1-eye.l,0,1)
+      eye.r = clamp(1-eye.r,0,1)
+      //Joy blendshape clashes with BlinkL and BlinkR blenshapes. Reset Joy
+      joy = 0
+      
+      Blendshape.setValue( PresetName.Blink, 0 )
+      Blendshape.setValue( PresetName.BlinkL, eye.l )
+      Blendshape.setValue( PresetName.BlinkR, eye.r )
+    }else{
+      const stabilizedBlink = clamp((1-eye.l),0,1)
+      //Subtract joy values from Blink values to avoid clipping
+      Blendshape.setValue( PresetName.Blink, stabilizedBlink-joy)
+      Blendshape.setValue( PresetName.BlinkL, 0)
+      Blendshape.setValue( PresetName.BlinkR, 0)
+    }
+
+    Blendshape.setValue( PresetName.I, riggedFace.mouth.shape.I - joy );
+    Blendshape.setValue( PresetName.A, riggedFace.mouth.shape.A - joy );
+    Blendshape.setValue( PresetName.E, riggedFace.mouth.shape.E - joy );
+    Blendshape.setValue( PresetName.O, riggedFace.mouth.shape.O - joy );
+    Blendshape.setValue( PresetName.U, riggedFace.mouth.shape.U - joy );
+  
+    Blendshape.setValue( PresetName.Joy, joy)
+  
+    //PUPILS
+    //lookat method accepts Three.euler objects
+    let lookTarget = new THREE.Euler( 
+        clamp(.8 * riggedFace.pupil.y, -.6 , .6), 
+        riggedFace.pupil.x , 
+        0, 
+        'XYZ' )
+      currentVrm.lookAt.applyer.lookAt(lookTarget)
+    }
+
   }
   
   //Animate Pose
