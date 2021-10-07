@@ -96,12 +96,28 @@ const rigJoint = (name, rotation) => {
   Part.quaternion.copy(quaternion);
 };
 
-const rigCharacter = (vrm, rotations) => {
+const rigCharacter = (vrm, results) => {
   if (!vrm) {
     return;
   }
-  // console.log(rotations);
-  //rotation array from blazepose ghum
+  
+  const faceLandmarks = results.faceLandmarks
+  const pose3DLandmarks = results.ea
+  const poseLandmarks = results.poseLandmarks
+  const leftHandLandmarks = results.leftHandLandmarks 
+  const rightHandLandmarks = results.rightHandLandmarks
+  
+  if(poseLandmarks && pose3DLandmarks){
+    let riggedPose = Kalidokit.Pose.solve(pose3DLandmarks,poseLandmarks,{runtime:'mediapipe'})
+    rigJoint("RightUpperArm", riggedPose.RightUpperArm);
+    rigJoint("RightLowerArm", riggedPose.RightUpperArm);
+    rigJoint("LeftUpperArm", riggedPose.RightUpperArm);
+    rigJoint("LeftLowerArm", riggedPose.RightUpperArm);
+    rigJoint("RightHand", riggedPose.RightUpperArm);
+    rigJoint("LeftHand", riggedPose.RightUpperArm);
+
+
+  }
 
   //unsure if NECK_01 or HEAD_01
   rigJoint("Neck", rotations);
@@ -115,14 +131,10 @@ const rigCharacter = (vrm, rotations) => {
 
   // unsure if shoulder joints need to be updated
   //         rigJoint("RightShoulder", "UPPERARM_L", rotations);
-  rigJoint("RightUpperArm", rotations);
-  rigJoint("RightLowerArm", rotations);
-  rigJoint("RightHand", rotations);
+
 
   //         rigJoint("LeftShoulder", "UPPERARM_L", rotations);
-  rigJoint("LeftUpperArm", rotations);
-  rigJoint("LeftLowerArm", rotations);
-  rigJoint("LeftHand", rotations);
+ 
 
   // rigJoint("LeftUpperLeg", "THIGH_L", rotations);
   // rigJoint("LeftLowerLeg", "CALF_L", rotations);
@@ -200,7 +212,7 @@ async function initHolistic() {
   });
   //holistic has callback function
   holistic.onResults(results => {
-    console.log(results);
+    rigCharacter(currentVrm,results);
   });
 }
 initHolistic()
