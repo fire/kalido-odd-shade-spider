@@ -57,6 +57,7 @@ animate();
 // Import Character VRM
 const loader = new THREE.GLTFLoader();
 loader.crossOrigin = "anonymous";
+//import model from URL
 loader.load(
   "https://cdn.glitch.me/da3ef98f-b816-4270-a371-6d7912e2a554%2F9e943a97-44ea-4946-bbfb-32d13f509880_AliciaSolid.vrm?v=1633366694935",
 
@@ -105,7 +106,8 @@ const rigRotation = (
     rotation.z * dampener
   );
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  Part.quaternion.slerp(quaternion, lerp); //interpolation easing
+  //interpolate
+  Part.quaternion.slerp(quaternion, lerp);
 };
 
 //Part Position Helper Function
@@ -160,9 +162,6 @@ const animateVRM = (vrm, results) => {
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
-    
-    //lerp blendshapes
-    riggedFace.eye.l = lerp()
 
     //handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
@@ -177,15 +176,15 @@ const animateVRM = (vrm, results) => {
       Blendshape.setValue(PresetName.BlinkL, 0);
       Blendshape.setValue(PresetName.BlinkR, 0);
     }
-
-    Blendshape.setValue(PresetName.I, riggedFace.mouth.shape.I);
-    Blendshape.setValue(PresetName.A, riggedFace.mouth.shape.A);
-    Blendshape.setValue(PresetName.E, riggedFace.mouth.shape.E);
-    Blendshape.setValue(PresetName.O, riggedFace.mouth.shape.O);
-    Blendshape.setValue(PresetName.U, riggedFace.mouth.shape.U);
+    
+    //lerp and set mouth blendshapes
+    Blendshape.setValue(PresetName.I, lerp(riggedFace.mouth.shape.I,Blendshape.getValue(PresetName.I), .5));
+    Blendshape.setValue(PresetName.A, lerp(riggedFace.mouth.shape.A,Blendshape.getValue(PresetName.A), .5));
+    Blendshape.setValue(PresetName.E, lerp(riggedFace.mouth.shape.E,Blendshape.getValue(PresetName.E), .5));
+    Blendshape.setValue(PresetName.O, lerp(riggedFace.mouth.shape.O,Blendshape.getValue(PresetName.O), .5));
+    Blendshape.setValue(PresetName.U, lerp(riggedFace.mouth.shape.U,Blendshape.getValue(PresetName.U), .5));
 
     //PUPILS
-    //lookat method accepts Three.euler objects
     let lookTarget = new THREE.Euler(
       clamp(0.8 * riggedFace.pupil.y, -0.6, 0.6),
       riggedFace.pupil.x,
