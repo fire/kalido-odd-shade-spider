@@ -157,11 +157,12 @@ const rigCharacter = (vrm, results) => {
 
   if (leftHandLandmarks) {
     riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
+    console.log(riggedLeftHand)
     rigRotation("LeftHand", {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.LeftHand.z,
       y: riggedLeftHand.LeftWrist.y,
-      z: riggedLeftHand.LeftWrist.z
+      x: riggedLeftHand.LeftWrist.x
     });
   }
 
@@ -171,7 +172,7 @@ const rigCharacter = (vrm, results) => {
       //combine pose rotation Z and hand rotation X Y
       z: riggedPose.RightHand.z,
       y: riggedRightHand.RightWrist.y,
-      z: riggedRightHand.RightWrist.z
+      x: riggedRightHand.RightWrist.x
     });
   }
 };
