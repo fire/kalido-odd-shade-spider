@@ -7,7 +7,7 @@ const lerp = Kalidokit.Vector.lerp;
 let currentVrm;
 
 // renderer
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
@@ -33,10 +33,7 @@ const scene = new THREE.Scene();
 // light
 const light = new THREE.DirectionalLight(0xffffff);
 light.position.set(1.0, 1.0, 1.0).normalize();
-// helpers
-const gridHelper = new THREE.GridHelper(10, 10);
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper, gridHelper, light);
+scene.add(light);
 
 // Main Render Loop
 const clock = new THREE.Clock();
