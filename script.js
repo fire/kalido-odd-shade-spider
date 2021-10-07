@@ -155,7 +155,8 @@ const animateVRM = (vrm, results) => {
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
 
-    // Mediapipe Holistic currently doesn't support eye tracking atm
+    // Mediapipe Holistic currently doesn't output eye tracking
+    // Eyetracking is only available on Facemesh models
     // This section will rig blinks when it does.
     
     // handle Wink
