@@ -119,8 +119,6 @@ const rigCharacter = (vrm, results) => {
     rigRotation("LeftUpperArm", riggedPose.LeftUpperArm);
     rigRotation("LeftLowerArm", riggedPose.LeftLowerArm);
     
-    
-    
     rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg);
     rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg);
     rigRotation("RightUpperLeg", riggedPose.RightUpperLeg);
