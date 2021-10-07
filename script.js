@@ -83,7 +83,7 @@ const rigRotation = (
   name,
   rotation = { x: 0, y: 0, z: 0 },
   dampener = 1,
-  lerp = 0.3
+  lerp = 0.4
 ) => {
   if (!currentVrm) {
     //return early if character not loaded
@@ -209,18 +209,18 @@ const animateVRM = (vrm, results) => {
       0.07
     );
 
-    rigRotation("Chest", riggedPose.Spine, 0.25);
-    rigRotation("Spine", riggedPose.Spine, 0.45);
+    rigRotation("Chest", riggedPose.Spine, 0.25, .3);
+    rigRotation("Spine", riggedPose.Spine, 0.45, .3);
 
-    rigRotation("RightUpperArm", riggedPose.RightUpperArm);
-    rigRotation("RightLowerArm", riggedPose.RightLowerArm);
-    rigRotation("LeftUpperArm", riggedPose.LeftUpperArm);
-    rigRotation("LeftLowerArm", riggedPose.LeftLowerArm);
+    rigRotation("RightUpperArm", riggedPose.RightUpperArm, 1, .3);
+    rigRotation("RightLowerArm", riggedPose.RightLowerArm, 1, .3);
+    rigRotation("LeftUpperArm", riggedPose.LeftUpperArm, 1, .3);
+    rigRotation("LeftLowerArm", riggedPose.LeftLowerArm, 1, .3);
 
-    rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg);
-    rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg);
-    rigRotation("RightUpperLeg", riggedPose.RightUpperLeg);
-    rigRotation("RightLowerLeg", riggedPose.RightLowerLeg);
+    rigRotation("LeftUpperLeg", riggedPose.LeftUpperLeg, 1, .3);
+    rigRotation("LeftLowerLeg", riggedPose.LeftLowerLeg, 1, .3);
+    rigRotation("RightUpperLeg", riggedPose.RightUpperLeg, 1, .3);
+    rigRotation("RightLowerLeg", riggedPose.RightLowerLeg, 1, .3);
   }
 
   //Animate Hands
