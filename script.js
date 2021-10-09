@@ -280,7 +280,7 @@ let holistic,
 async function initHolistic() {
   holistic = new Holistic({
     locateFile: file => {
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1628005088/${file}`;
     }
   });
 
