@@ -338,13 +338,13 @@ const drawResults = (results) => {
     });
 }
 initHolistic();
-//use Mediapipe utils to get camera
+//use Mediapipe utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await holistic.send({image: videoElement});
   },
-  width: 1280,
-  height: 720
+  width: 640,
+  height: 480
 });
 camera.start();
 
