@@ -78,7 +78,7 @@ const rigRotation = (
   name,
   rotation = { x: 0, y: 0, z: 0 },
   dampener = 1,
-  lerp = 0.3
+  lerpAmount = 0.3
 ) => {
   if (!currentVrm) {return}
   const Part = currentVrm.humanoid.getBoneNode(
@@ -92,7 +92,7 @@ const rigRotation = (
     rotation.z * dampener
   );
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  Part.quaternion.slerp(quaternion, lerp); // interpolate
+  Part.quaternion.slerp(quaternion, lerpAmount); // interpolate
 };
 
 // Animate Position Helper Function
@@ -100,7 +100,7 @@ const rigPosition = (
   name,
   position = { x: 0, y: 0, z: 0 },
   dampener = 1,
-  lerp = 0.3
+  lerpAmount = 0.3
 ) => {
   if (!currentVrm) {return}
   const Part = currentVrm.humanoid.getBoneNode(
@@ -112,7 +112,7 @@ const rigPosition = (
     position.y * dampener,
     position.z * dampener
   );
-  Part.position.lerp(vector, lerp); // interpolate
+  Part.position.lerp(vector, lerpAmount); // interpolate
 };
 
 const rigFace = (riggedFace) => {
@@ -123,14 +123,14 @@ const rigFace = (riggedFace) => {
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
   
-    // Simple example without winking. Lerp based on old blendshape, then stabilize blink with `Kalidokit` helper function.
+    // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.
     riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
     riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
-    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
+    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye,riggedFace.head.y)
     Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
     
-    // Lerp and set mouth blendshapes
+    // Interpolate and set mouth blendshapes
     Blendshape.setValue(PresetName.I, lerp(riggedFace.mouth.shape.I,Blendshape.getValue(PresetName.I), .5));
     Blendshape.setValue(PresetName.A, lerp(riggedFace.mouth.shape.A,Blendshape.getValue(PresetName.A), .5));
     Blendshape.setValue(PresetName.E, lerp(riggedFace.mouth.shape.E,Blendshape.getValue(PresetName.E), .5));
