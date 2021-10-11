@@ -128,36 +128,13 @@ const rigPosition = (
   Part.position.lerp(vector, lerp);
 };
 
-//VRM Character Animator
-const animateVRM = (vrm, results) => {
-  if (!vrm) {
-    return;
-  }
-  //Take the results from Holistic and animate character based on its Face, Pose, and Hand Keypoints.
-
-  //Identify Key Landmarks
-  const faceLandmarks = results.faceLandmarks;
-  // Pose 3D Landmarks are with respect to Hip distance in meters
-  const pose3DLandmarks = results.ea;
-  // Pose 2D landmarks are with respect to videoWidth and videoHeight
-  const pose2DLandmarks = results.poseLandmarks;
-  //Hand landmarks may be reversed
-  const leftHandLandmarks = results.rightHandLandmarks;
-  const rightHandLandmarks = results.leftHandLandmarks;
-  let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
-
-  //Animate Face
-  if (faceLandmarks) {
+const animateFace = (faceLandmarks) => {
     riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:true});
     rigRotation("Neck", riggedFace.head, 0.7);
 
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
-
-    // Mediapipe Holistic currently doesn't output eye tracking
-    // Eyetracking is only available on Facemesh models
-    // This section will rig blinks when it does.
     
     // handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
@@ -188,6 +165,29 @@ const animateVRM = (vrm, results) => {
       "XYZ"
     );
     currentVrm.lookAt.applyer.lookAt(lookTarget);
+}
+
+//VRM Character Animator
+const animateVRM = (vrm, results) => {
+  if (!vrm) {
+    return;
+  }
+  //Take the results from Holistic and animate character based on its Face, Pose, and Hand Keypoints.
+
+  //Identify Key Landmarks
+  const faceLandmarks = results.faceLandmarks;
+  // Pose 3D Landmarks are with respect to Hip distance in meters
+  const pose3DLandmarks = results.ea;
+  // Pose 2D landmarks are with respect to videoWidth and videoHeight
+  const pose2DLandmarks = results.poseLandmarks;
+  //Hand landmarks may be reversed
+  const leftHandLandmarks = results.rightHandLandmarks;
+  const rightHandLandmarks = results.leftHandLandmarks;
+  let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
+
+  //Animate Face
+  if (faceLandmarks) {
+   animateFace(faceLandmarks)
   }
 
   //Animate Pose
@@ -298,8 +298,6 @@ async function initHolistic() {
     facemesh = await faceLandmarksDetection.load(
     faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
 }
-initHolistic();
-
 
 const onResults = (results) => {
   //animate model
@@ -307,6 +305,9 @@ const onResults = (results) => {
   //draw landmark guides
   drawResults(results)
 }
+
+initHolistic();
+
 
 const drawResults = (results) => {
   guideCanvas.width = videoElement.videoWidth;
@@ -347,25 +348,13 @@ const drawResults = (results) => {
 
 
 async function predict() {
-  // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain an
-  // array of detected faces from the MediaPipe graph. If passing in a video
-  // stream, a single prediction per frame will be returned.
-  const predictions = await model.estimateFaces({
+  if(!facemesh || !videoElement){return}
+  const predictions = await facemesh.estimateFaces({
     input: videoElement
   });
 
   if (predictions.length > 0) {
-
-//     for (let i = 0; i < predictions.length; i++) {
-//       const keypoints = predictions[i].scaledMesh;
-
-//       // Log facial keypoints.
-//       for (let i = 0; i < keypoints.length; i++) {
-//         const [x, y, z] = keypoints[i];
-
-//         console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-//       }
-//     }
+    animateFace(predictions[0].scaledMesh)
   }
 }
 
