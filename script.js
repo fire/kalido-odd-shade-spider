@@ -129,16 +129,21 @@ const rigPosition = (
 };
 
 const rigFace = (riggedFace) => {
+    if(!currentVrm){return}
     rigRotation("Neck", riggedFace.head, 0.7);
 
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
   
+    let oldEye = {
+      l: Blendshape.getValue(PresetName.Blink) !== 0 ? Blendshape.getValue(PresetName.Blink) : Blendshape.getValue(PresetName.BlinkL)
+      r: Blendshape.getValue(PresetName.Blink) !== 0 ? Blendshape.getValue(PresetName.Blink) : 
+    }
     riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.BlinkL), .5)
     riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.BlinkR), .5)
     
-    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
+    // riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
     console.log(riggedFace.eye)
     Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
     Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
@@ -363,7 +368,7 @@ async function predict() {
   });
 
   if (predictions.length > 0) {
-    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:false});
+    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
     rigFace(riggedFace)
   }
 }
