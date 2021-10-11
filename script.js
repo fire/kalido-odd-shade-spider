@@ -128,24 +128,24 @@ const rigPosition = (
   Part.position.lerp(vector, lerp);
 };
 
-const animateFace = (faceLandmarks) => {
-    riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:true});
+const rigFace = (riggedFace) => {
     rigRotation("Neck", riggedFace.head, 0.7);
 
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
     
+    //l
     // handle Wink
     if (riggedFace.eye.l !== riggedFace.eye.r) {
       riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
       riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
       Blendshape.setValue(PresetName.Blink, 0);
-      Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
-      Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
+      Blendshape.setValue(PresetName.BlinkL, lerp(riggedFace.eye.l,Blendshape.getValue(PresetName.BlinkL), .5));
+      Blendshape.setValue(PresetName.BlinkR, lerp(riggedFace.eye.r,Blendshape.getValue(PresetName.BlinkR), .5));
     } else {
       const stabilizedBlink = clamp(1 - riggedFace.eye.l, 0, 1);
-      Blendshape.setValue(PresetName.Blink, stabilizedBlink);
+      Blendshape.setValue(PresetName.Blink, lerp(stabilizedBlink,Blendshape.getValue(PresetName.Blink), .5));
       Blendshape.setValue(PresetName.BlinkL, 0);
       Blendshape.setValue(PresetName.BlinkR, 0);
     }
@@ -164,6 +164,7 @@ const animateFace = (faceLandmarks) => {
       0,
       "XYZ"
     );
+    console.log(currentVrm.lookAt)
     currentVrm.lookAt.applyer.lookAt(lookTarget);
 }
 
@@ -187,7 +188,8 @@ const animateVRM = (vrm, results) => {
 
   //Animate Face
   if (faceLandmarks) {
-   animateFace(faceLandmarks)
+   riggedFace = Kalidokit.Face.solve(faceLandmarks[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
+   rigFace(riggedFace)
   }
 
   //Animate Pose
@@ -354,7 +356,8 @@ async function predict() {
   });
 
   if (predictions.length > 0) {
-    animateFace(predictions[0].scaledMesh)
+    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
+    rigFace(riggedFace)
   }
 }
 
