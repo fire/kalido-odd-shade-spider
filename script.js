@@ -37,7 +37,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   if (currentVrm) {
-    //keep model physics up to date
+    // Update model to render physics
     currentVrm.update(clock.getDelta());
   }
   renderer.render(scene, orbitCamera);
@@ -49,7 +49,7 @@ animate();
 // Import Character VRM
 const loader = new THREE.GLTFLoader();
 loader.crossOrigin = "anonymous";
-//import model from URL
+// Import model from URL, add your own model here
 loader.load(
   "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
 
@@ -59,7 +59,7 @@ loader.load(
     THREE.VRM.from(gltf).then(vrm => {
       scene.add(vrm.scene);
       currentVrm = vrm;
-      currentVrm.scene.rotation.y = Math.PI; //rotate model 180deg to face camera
+      currentVrm.scene.rotation.y = Math.PI; // Rotate model 180deg to face camera
     });
   },
 
@@ -73,59 +73,46 @@ loader.load(
   error => console.error(error)
 );
 
-//Part Rotation Helper function
+// Animate Rotation Helper function
 const rigRotation = (
   name,
   rotation = { x: 0, y: 0, z: 0 },
   dampener = 1,
   lerp = 0.3
 ) => {
-  if (!currentVrm) {
-    //return early if character not loaded
-    return;
-  }
+  if (!currentVrm) {return}
   const Part = currentVrm.humanoid.getBoneNode(
     THREE.VRMSchema.HumanoidBoneName[name]
   );
-  if (!Part) {
-    //return early if part doesn't exist
-    return;
-  }
-
+  if (!Part) {return}
+  
   let euler = new THREE.Euler(
     rotation.x * dampener,
     rotation.y * dampener,
     rotation.z * dampener
   );
   let quaternion = new THREE.Quaternion().setFromEuler(euler);
-  //interpolate
-  Part.quaternion.slerp(quaternion, lerp);
+  Part.quaternion.slerp(quaternion, lerp); // interpolate
 };
 
-//Part Position Helper Function
+// Animate Position Helper Function
 const rigPosition = (
   name,
   position = { x: 0, y: 0, z: 0 },
   dampener = 1,
   lerp = 0.3
 ) => {
-  if (!currentVrm) {
-    //return early if character not loaded
-    return;
-  }
+  if (!currentVrm) {return}
   const Part = currentVrm.humanoid.getBoneNode(
     THREE.VRMSchema.HumanoidBoneName[name]
   );
-  if (!Part) {
-    //return early if part doesn't exist
-    return;
-  }
+  if (!Part) {return}
   let vector = new THREE.Vector3(
     position.x * dampener,
     position.y * dampener,
     position.z * dampener
   );
-  Part.position.lerp(vector, lerp);
+  Part.position.lerp(vector, lerp); // interpolate
 };
 
 const rigFace = (riggedFace) => {
@@ -136,13 +123,14 @@ const rigFace = (riggedFace) => {
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
   
-    // Simple example without winking. Lerp based on old blendshape, then stabilize blink with Kalidokit helper function.
+    // Simple example without winking. Lerp based on old blendshape, then stabilize blink with `Kalidokit` helper function.
+    // for VRM, 1 is closed, 0 is open.
     riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
     riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
     riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
     Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
     
-    //lerp and set mouth blendshapes
+    // Lerp and set mouth blendshapes
     Blendshape.setValue(PresetName.I, lerp(riggedFace.mouth.shape.I,Blendshape.getValue(PresetName.I), .5));
     Blendshape.setValue(PresetName.A, lerp(riggedFace.mouth.shape.A,Blendshape.getValue(PresetName.A), .5));
     Blendshape.setValue(PresetName.E, lerp(riggedFace.mouth.shape.E,Blendshape.getValue(PresetName.E), .5));
@@ -165,38 +153,36 @@ const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
-  //Take the results from Holistic and animate character based on its Face, Pose, and Hand Keypoints.
+  // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
+  let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
-  //Identify Key Landmarks
   const faceLandmarks = results.faceLandmarks;
   // Pose 3D Landmarks are with respect to Hip distance in meters
   const pose3DLandmarks = results.ea;
   // Pose 2D landmarks are with respect to videoWidth and videoHeight
   const pose2DLandmarks = results.poseLandmarks;
-  //Hand landmarks may be reversed
+  // Be careful, hand landmarks may be reversed
   const leftHandLandmarks = results.rightHandLandmarks;
   const rightHandLandmarks = results.leftHandLandmarks;
-  let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
-  //Animate Face
+  // Animate Face
   if (faceLandmarks) {
    riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:false});
    rigFace(riggedFace)
   }
 
-  //Animate Pose
+  // Animate Pose
   if (pose2DLandmarks && pose3DLandmarks) {
     riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
       runtime: "mediapipe"
     });
-    // console.log(riggedPose)
     rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
     rigPosition(
       "Hips",
       {
-        x: -riggedPose.Hips.position.x, //reverse direction
-        y: riggedPose.Hips.position.y + 1, //add a bit of height
-        z: -riggedPose.Hips.position.z // reverse direction
+        x: -riggedPose.Hips.position.x, // Reverse direction
+        y: riggedPose.Hips.position.y + 1, // Add a bit of height
+        z: -riggedPose.Hips.position.z // Reverse direction
       },
       1,
       0.07
@@ -216,11 +202,11 @@ const animateVRM = (vrm, results) => {
     rigRotation("RightLowerLeg", riggedPose.RightLowerLeg, 1, .3);
   }
 
-  //Animate Hands
+  // Animate Hands
   if (leftHandLandmarks) {
     riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
     rigRotation("LeftHand", {
-      //combine pose rotation Z and hand rotation X Y
+      // Combine pose rotation Z and hand rotation X Y
       z: riggedPose.LeftHand.z,
       y: riggedLeftHand.LeftWrist.y,
       x: riggedLeftHand.LeftWrist.x
@@ -244,7 +230,7 @@ const animateVRM = (vrm, results) => {
   if (rightHandLandmarks) {
     riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
     rigRotation("RightHand", {
-      //combine pose rotation Z and hand rotation X Y
+      // Combine Z axis from pose hand and X/Y axis from hand wrist rotation
       z: riggedPose.RightHand.z,
       y: riggedRightHand.RightWrist.y,
       x: riggedRightHand.RightWrist.x
@@ -284,14 +270,14 @@ async function initHolistic() {
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7
   });
-  //pass holistic a callback function
+  // Pass holistic a callback function
   holistic.onResults(onResults);
 }
 
 const onResults = (results) => {
-  //animate model
+  // Animate model
   animateVRM(currentVrm, results);
-  //draw landmark guides
+  // Draw landmark guides
   drawResults(results)
 }
 
@@ -301,7 +287,7 @@ const drawResults = (results) => {
   let canvasCtx = guideCanvas.getContext('2d');
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
-  //use mediapipe drawing functions
+  // Use `Mediapipe` drawing functions
   drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
       color: "#00cff7",
       lineWidth: 4
@@ -334,7 +320,7 @@ const drawResults = (results) => {
 
 initHolistic();
 
-//use Mediapipe utils to get camera - lower resolution = higher fps
+// Use `Mediapipe` utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await holistic.send({image: videoElement});
@@ -343,17 +329,3 @@ const camera = new Camera(videoElement, {
   height: 480
 });
 camera.start();
-
-
-
-// async function predict() {
-//   if(!facemesh || !videoElement){return}
-//   const predictions = await facemesh.estimateFaces({
-//     input: videoElement
-//   });
-
-//   if (predictions.length > 0) {
-//     let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:false});
-//     rigFace(riggedFace)
-//   }
-// }
