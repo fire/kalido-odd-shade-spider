@@ -136,31 +136,11 @@ const rigFace = (riggedFace) => {
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
   
-    let oldEye = {
-      l: Blendshape.getValue(PresetName.Blink) !== 0 ? Blendshape.getValue(PresetName.Blink) : Blendshape.getValue(PresetName.BlinkL)
-      r: Blendshape.getValue(PresetName.Blink) !== 0 ? Blendshape.getValue(PresetName.Blink) : 
-    }
-    riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.BlinkL), .5)
-    riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.BlinkR), .5)
-    
-    // riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
-    console.log(riggedFace.eye)
-    Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
-    Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
-  
-    // // handle Wink
-    // if (riggedFace.eye.l !== riggedFace.eye.r) {
-    //   // riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
-    //   // riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
-    //   Blendshape.setValue(PresetName.Blink, 0);
-    //   Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
-    //   Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
-    // } else {
-    //   // const stabilizedBlink = clamp(1 - riggedFace.eye.l, 0, 1);
-    //   Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
-    //   Blendshape.setValue(PresetName.BlinkL, 0);
-    //   Blendshape.setValue(PresetName.BlinkR, 0);
-    // }
+    // Simple example without winking. Lerp based on old blendshape, then stabilize blink with Kalidokit helper function.
+    riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
+    riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.Blink), .5)
+    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
+    Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
     
     //lerp and set mouth blendshapes
     Blendshape.setValue(PresetName.I, lerp(riggedFace.mouth.shape.I,Blendshape.getValue(PresetName.I), .5));
@@ -200,7 +180,7 @@ const animateVRM = (vrm, results) => {
 
   //Animate Face
   if (faceLandmarks) {
-   riggedFace = Kalidokit.Face.solve(faceLandmarks[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
+   riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:false});
    rigFace(riggedFace)
   }
 
@@ -288,10 +268,8 @@ const animateVRM = (vrm, results) => {
 };
 
 //* SETUP MEDIAPIPE HOLISTIC INSTANCE *//
-let holistic,
-    videoElement = document.querySelector(".input_video"),
-    guideCanvas = document.querySelector('canvas.guides'),
-    facemesh
+let holistic,videoElement = document.querySelector(".input_video"),
+    guideCanvas = document.querySelector('canvas.guides'),facemesh
 
 async function initHolistic() {
   holistic = new Holistic({
@@ -308,9 +286,6 @@ async function initHolistic() {
   });
   //pass holistic a callback function
   holistic.onResults(onResults);
-  
-    facemesh = await faceLandmarksDetection.load(
-    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
 }
 
 const onResults = (results) => {
@@ -319,9 +294,6 @@ const onResults = (results) => {
   //draw landmark guides
   drawResults(results)
 }
-
-initHolistic();
-
 
 const drawResults = (results) => {
   guideCanvas.width = videoElement.videoWidth;
@@ -360,27 +332,28 @@ const drawResults = (results) => {
     });
 }
 
-
-async function predict() {
-  if(!facemesh || !videoElement){return}
-  const predictions = await facemesh.estimateFaces({
-    input: videoElement
-  });
-
-  if (predictions.length > 0) {
-    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
-    rigFace(riggedFace)
-  }
-}
+initHolistic();
 
 //use Mediapipe utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
-    await predict()
-    // await holistic.send({image: videoElement});
+    await holistic.send({image: videoElement});
   },
   width: 640,
   height: 480
 });
 camera.start();
 
+
+
+// async function predict() {
+//   if(!facemesh || !videoElement){return}
+//   const predictions = await facemesh.estimateFaces({
+//     input: videoElement
+//   });
+
+//   if (predictions.length > 0) {
+//     let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:false});
+//     rigFace(riggedFace)
+//   }
+// }
