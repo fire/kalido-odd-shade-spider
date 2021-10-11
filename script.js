@@ -276,7 +276,9 @@ const animateVRM = (vrm, results) => {
 //* SETUP MEDIAPIPE HOLISTIC INSTANCE *//
 let holistic,
     videoElement = document.querySelector(".input_video"),
-    guideCanvas = document.querySelector('canvas.guides')
+    guideCanvas = document.querySelector('canvas.guides'),
+    facemesh
+
 async function initHolistic() {
   holistic = new Holistic({
     locateFile: file => {
@@ -290,9 +292,14 @@ async function initHolistic() {
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7
   });
-  //holistic has callback function
+  //pass holistic a callback function
   holistic.onResults(onResults);
+  
+    facemesh = await faceLandmarksDetection.load(
+    faceLandmarksDetection.SupportedPackages.mediapipeFacemesh);
 }
+initHolistic();
+
 
 const onResults = (results) => {
   //animate model
@@ -337,11 +344,36 @@ const drawResults = (results) => {
       lineWidth: 2
     });
 }
-initHolistic();
+
+
+async function predict() {
+  // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain an
+  // array of detected faces from the MediaPipe graph. If passing in a video
+  // stream, a single prediction per frame will be returned.
+  const predictions = await model.estimateFaces({
+    input: videoElement
+  });
+
+  if (predictions.length > 0) {
+
+//     for (let i = 0; i < predictions.length; i++) {
+//       const keypoints = predictions[i].scaledMesh;
+
+//       // Log facial keypoints.
+//       for (let i = 0; i < keypoints.length; i++) {
+//         const [x, y, z] = keypoints[i];
+
+//         console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
+//       }
+//     }
+  }
+}
+
 //use Mediapipe utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
-    await holistic.send({image: videoElement});
+    await predict()
+    // await holistic.send({image: videoElement});
   },
   width: 640,
   height: 480
