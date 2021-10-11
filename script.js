@@ -134,21 +134,28 @@ const rigFace = (riggedFace) => {
     // Blendshapes and Preset Name Schema
     const Blendshape = currentVrm.blendShapeProxy;
     const PresetName = THREE.VRMSchema.BlendShapePresetName;
+  
+    riggedFace.eye.l = lerp(clamp(1 - riggedFace.eye.l, 0, 1),Blendshape.getValue(PresetName.BlinkL), .5)
+    riggedFace.eye.r = lerp(clamp(1 - riggedFace.eye.r, 0, 1),Blendshape.getValue(PresetName.BlinkR), .5)
     
-    //l
-    // handle Wink
-    if (riggedFace.eye.l !== riggedFace.eye.r) {
-      riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
-      riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
-      Blendshape.setValue(PresetName.Blink, 0);
-      Blendshape.setValue(PresetName.BlinkL, lerp(riggedFace.eye.l,Blendshape.getValue(PresetName.BlinkL), .5));
-      Blendshape.setValue(PresetName.BlinkR, lerp(riggedFace.eye.r,Blendshape.getValue(PresetName.BlinkR), .5));
-    } else {
-      const stabilizedBlink = clamp(1 - riggedFace.eye.l, 0, 1);
-      Blendshape.setValue(PresetName.Blink, lerp(stabilizedBlink,Blendshape.getValue(PresetName.Blink), .5));
-      Blendshape.setValue(PresetName.BlinkL, 0);
-      Blendshape.setValue(PresetName.BlinkR, 0);
-    }
+    riggedFace.eye = Kalidokit.Face.stabilizeBlink(riggedFace.eye)
+    console.log(riggedFace.eye)
+    Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
+    Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
+  
+    // // handle Wink
+    // if (riggedFace.eye.l !== riggedFace.eye.r) {
+    //   // riggedFace.eye.l = clamp(1 - riggedFace.eye.l, 0, 1);
+    //   // riggedFace.eye.r = clamp(1 - riggedFace.eye.r, 0, 1);
+    //   Blendshape.setValue(PresetName.Blink, 0);
+    //   Blendshape.setValue(PresetName.BlinkL, riggedFace.eye.l);
+    //   Blendshape.setValue(PresetName.BlinkR, riggedFace.eye.r);
+    // } else {
+    //   // const stabilizedBlink = clamp(1 - riggedFace.eye.l, 0, 1);
+    //   Blendshape.setValue(PresetName.Blink, riggedFace.eye.l);
+    //   Blendshape.setValue(PresetName.BlinkL, 0);
+    //   Blendshape.setValue(PresetName.BlinkR, 0);
+    // }
     
     //lerp and set mouth blendshapes
     Blendshape.setValue(PresetName.I, lerp(riggedFace.mouth.shape.I,Blendshape.getValue(PresetName.I), .5));
@@ -356,7 +363,7 @@ async function predict() {
   });
 
   if (predictions.length > 0) {
-    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:true});
+    let riggedFace = Kalidokit.Face.solve(predictions[0].scaledMesh,{runtime:"mediapipe",smoothBlink:false});
     rigFace(riggedFace)
   }
 }
