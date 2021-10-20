@@ -138,14 +138,18 @@ const rigFace = (riggedFace) => {
     Blendshape.setValue(PresetName.U, lerp(riggedFace.mouth.shape.U,Blendshape.getValue(PresetName.U), .5));
 
     //PUPILS
-    let lookTarget = new THREE.Euler(
-      clamp(0.8 * riggedFace.pupil.y, -0.6, 0.6),
-      riggedFace.pupil.x,
-      0,
-      "XYZ"
+    let oldLookTarget = new THREE.Quaternion().setFromEuler(currentVrm.lookAt._euler)
+    let lookTarget = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(
+        clamp(riggedFace.pupil.y, -0.6, 0.6),
+        riggedFace.pupil.x,
+        0,
+        "XYZ"
+      )
     );
-    console.log(currentVrm.lookAt._euler)
-    currentVrm.lookAt.applyer.lookAt(lookTarget);
+    let interpolatedLookTarget = new THREE.Euler().setFromQuaternion(oldLookTarget.slerp(lookTarget,.4))
+    console.log(interpolatedLookTarget)
+    currentVrm.lookAt.applyer.lookAt(interpolatedLookTarget);
 }
 
 //VRM Character Animator
