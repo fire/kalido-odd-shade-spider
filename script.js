@@ -272,7 +272,8 @@ async function initHolistic() {
     modelComplexity: 1,
     smoothLandmarks: true,
     minDetectionConfidence: 0.7,
-    minTrackingConfidence: 0.7
+    minTrackingConfidence: 0.7,
+    refineLandmarks: true,
   });
   // Pass holistic a callback function
   holistic.onResults(onResults);
