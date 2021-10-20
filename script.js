@@ -144,7 +144,7 @@ const rigFace = (riggedFace) => {
       0,
       "XYZ"
     );
-    console.log(currentVrm.lookAt)
+    console.log(currentVrm.lookAt._euler)
     currentVrm.lookAt.applyer.lookAt(lookTarget);
 }
 
