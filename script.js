@@ -3,7 +3,7 @@ const remap = Kalidokit.Utils.remap;
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
-//* THREEJS WORLD SETUP *//
+/* THREEJS WORLD SETUP */
 let currentVrm;
 
 // renderer
@@ -44,7 +44,7 @@ function animate() {
 }
 animate();
 
-//* VRM CHARACTER SETUP *//
+/* VRM CHARACTER SETUP */
 
 // Import Character VRM
 const loader = new THREE.GLTFLoader();
@@ -152,7 +152,7 @@ const rigFace = (riggedFace) => {
     currentVrm.lookAt.applyer.lookAt(interpolatedLookTarget);
 }
 
-//VRM Character Animator
+/* VRM Character Animator */
 const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
@@ -257,7 +257,7 @@ const animateVRM = (vrm, results) => {
   }
 };
 
-//* SETUP MEDIAPIPE HOLISTIC INSTANCE *//
+/* SETUP MEDIAPIPE HOLISTIC INSTANCE */
 let holistic,videoElement = document.querySelector(".input_video"),
     guideCanvas = document.querySelector('canvas.guides'),facemesh
 
