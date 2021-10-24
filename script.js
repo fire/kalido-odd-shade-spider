@@ -157,6 +157,8 @@ const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
+  console.log(results)
+  return
   // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
@@ -258,11 +260,17 @@ const animateVRM = (vrm, results) => {
 };
 
 /* SETUP MEDIAPIPE HOLISTIC INSTANCE */
-let holistic,videoElement = document.querySelector(".input_video"),
+let videoElement = document.querySelector(".input_video"),
     guideCanvas = document.querySelector('canvas.guides'),facemesh
 
-async function initHolistic() {
-  holistic = new Holistic({
+const onResults = (results) => {
+  // Animate model
+  animateVRM(currentVrm, results);
+  // Draw landmark guides
+  // drawResults(results)
+}
+
+const holistic = new Holistic({
     locateFile: file => {
       return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
     }
@@ -277,14 +285,17 @@ async function initHolistic() {
   });
   // Pass holistic a callback function
   holistic.onResults(onResults);
-}
 
-const onResults = (results) => {
-  // Animate model
-  animateVRM(currentVrm, results);
-  // Draw landmark guides
-  drawResults(results)
-}
+const faceMesh = new FaceMesh({locateFile: (file) => {
+  return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+}});
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true,
+  minDetectionConfidence: 0.5,
+  minTrackingConfidence: 0.5
+});
+faceMesh.onResults(onResults);
 
 const drawResults = (results) => {
   guideCanvas.width = videoElement.videoWidth;
@@ -323,12 +334,11 @@ const drawResults = (results) => {
     });
 }
 
-initHolistic();
-
 // Use `Mediapipe` utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
-    await holistic.send({image: videoElement});
+    // await holistic.send({image: videoElement});
+    await faceMesh.send({image: videoElement});
   },
   width: 640,
   height: 480
