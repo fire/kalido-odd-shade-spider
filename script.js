@@ -2,6 +2,7 @@
 const remap = Kalidokit.Utils.remap;
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
+const 
 
 /* THREEJS WORLD SETUP */
 let currentVrm;
@@ -138,18 +139,15 @@ const rigFace = (riggedFace) => {
     Blendshape.setValue(PresetName.U, lerp(riggedFace.mouth.shape.U,Blendshape.getValue(PresetName.U), .5));
 
     //PUPILS
-    let oldLookTarget = new THREE.Quaternion().setFromEuler(currentVrm.lookAt._euler)
-    let lookTarget = new THREE.Quaternion().setFromEuler(
-      new THREE.Euler(
+    let oldLookTarget = currentVrm.lookAt._euler
+    console.log(currentVrm.lookAt.applyer)
+    let lookTarget = new THREE.Euler(
         clamp(riggedFace.pupil.y, -0.6, 0.6),
         riggedFace.pupil.x,
         0,
         "XYZ"
       )
-    );
-    let interpolatedLookTarget = new THREE.Euler().setFromQuaternion(oldLookTarget.slerp(lookTarget,.4))
-    console.log(interpolatedLookTarget)
-    currentVrm.lookAt.applyer.lookAt(interpolatedLookTarget);
+    currentVrm.lookAt.applyer.lookAt(lookTarget);
 }
 
 /* VRM Character Animator */
@@ -157,7 +155,10 @@ const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
-  console.log(results)
+  if (results.multiFaceLandmarks.length>0) {
+   let riggedFace = Kalidokit.Face.solve(results.multiFaceLandmarks[0],{runtime:"mediapipe",smoothBlink:false});
+   rigFace(riggedFace)
+  }
   return
   // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
