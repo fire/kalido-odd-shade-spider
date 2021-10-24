@@ -139,6 +139,7 @@ const rigFace = (riggedFace) => {
     Blendshape.setValue(PresetName.U, lerp(riggedFace.mouth.shape.U,Blendshape.getValue(PresetName.U), .5));
 
     //PUPILS
+    //interpolate pupil and keep a copy of the value
     let lookTarget =
       new THREE.Euler(
         lerp(oldLookTarget.x , riggedFace.pupil.y, .4),
@@ -180,14 +181,18 @@ const animateVRM = (vrm, results) => {
 
   // Animate Face
   if (faceLandmarks) {
-   riggedFace = Kalidokit.Face.solve(faceLandmarks,{runtime:"mediapipe",smoothBlink:false});
+   riggedFace = Kalidokit.Face.solve(faceLandmarks,{
+      runtime:"mediapipe",
+      video:videoElement
+   });
    rigFace(riggedFace)
   }
 
   // Animate Pose
   if (pose2DLandmarks && pose3DLandmarks) {
     riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
-      runtime: "mediapipe"
+      runtime: "mediapipe",
+      video:videoElement,
     });
     rigRotation("Hips", riggedPose.Hips.rotation, 0.7);
     rigPosition(
