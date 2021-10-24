@@ -115,7 +115,7 @@ const rigPosition = (
   Part.position.lerp(vector, lerpAmount); // interpolate
 };
 
-let oldLookTarget = new THREE.Quaternion()
+let oldLookTarget = new THREE.Euler()
 const rigFace = (riggedFace) => {
     if(!currentVrm){return}
     rigRotation("Neck", riggedFace.head, 0.7);
@@ -139,18 +139,15 @@ const rigFace = (riggedFace) => {
     Blendshape.setValue(PresetName.U, lerp(riggedFace.mouth.shape.U,Blendshape.getValue(PresetName.U), .5));
 
     //PUPILS
-    let lookTarget = new THREE.Quaternion().setFromEuler(
+    let lookTarget =
       new THREE.Euler(
-        clamp(riggedFace.pupil.y, -0.6, 0.6),
-        riggedFace.pupil.x,
+        lerp(oldLookTarget.x , riggedFace.pupil.y, .4),
+        lerp(oldLookTarget.y, riggedFace.pupil.x, .4),
         0,
         "XYZ"
       )
-    );
-    let interpolatedLookTarget = oldLookTarget.slerp(lookTarget,.1)
-    oldLookTarget.copy(interpolatedLookTarget)
-    console.log(interpolatedLookTarget)
-    currentVrm.lookAt.applyer.lookAt(new THREE.Euler().setFromQuaternion(interpolatedLookTarget);
+    oldLookTarget.copy(lookTarget)
+    currentVrm.lookAt.applyer.lookAt(lookTarget);
 }
 
 /* VRM Character Animator */
@@ -158,7 +155,6 @@ const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
-  console.log(results)
   if (results.multiFaceLandmarks.length>0) {
    let riggedFace = Kalidokit.Face.solve(results.multiFaceLandmarks[0],{runtime:"mediapipe",smoothBlink:false});
    rigFace(riggedFace)
