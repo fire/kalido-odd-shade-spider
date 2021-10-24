@@ -155,8 +155,19 @@ const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
   }
+  console.log(results)
   if (results.multiFaceLandmarks.length>0) {
-   let riggedFace = Kalidokit.Face.solve(results.multiFaceLandmarks[0],{runtime:"mediapipe",smoothBlink:false});
+   results.multiFaceLandmarks[0].forEach(e=>{
+     e.x *= videoElement.videoWidth;
+     e.y *= videoElement.videoHeight;
+     e.z *= videoElement.videoWidth;
+   })
+   let riggedFace = Kalidokit.Face.solve(
+     results.multiFaceLandmarks[0],{
+       runtime:"mediapipe",
+       video:videoElement,
+       smoothBlink:false
+     });
    rigFace(riggedFace)
   }
   return
