@@ -15,75 +15,17 @@
     ></script>
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <!--     Mediapipe Drawing Tools -->
     <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
       crossorigin="anonymous"
     ></script>
+    <!--     Mediapipe Camera Tools -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <!--     Kalidokit Kinematic Solver -->
     <script src="kalidokit.umd.js"></script>
     
-    <style>
-      @font-face {
-        font-family: "Jelly";
-        font-display: block;
-        src: url("https://yeemachine.github.io/kalidoface-live2d-models/Font/kalidoface-jelly.ttf")
-          format("truetype");
-      }
-      h1 {
-        font-family: "Jelly";
-        font-size: 36px;
-        color: white;
-        position: absolute;
-        top: -8px;
-        left: 16px;
-        font-weight: normal;
-        -webkit-font-feature-settings: "liga";
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      a,a:visited,a:link{
-        text-decoration:none;
-        color:#222;
-        display:flex;
-      }
-      .preview {
-        display: flex;
-        position: absolute;
-        bottom: 16px;
-        right: 16px;
-        transform: scale(-1, 1);
-        overflow: hidden;
-        border-radius: 8px;
-      }
-      video {
-        max-width: 300px;
-        height: auto;
-      }
-      body {
-        margin: 0;
-      }
-      canvas {
-        display: block;
-      }
-      .guides {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: auto;
-        width: 100%;
-        z-index: 1;
-      }
-      nav{
-        position:absolute;
-        top:8px;
-        right:8px;
-      }
-      nav img{
-        width:48px;
-        hight:auto;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
 
   <body>
@@ -91,18 +33,18 @@
       <video class="input_video" width="1280px" height="720px"></video>
       <canvas class="guides"></canvas>
     </div>
-    <script src="script.js"></script>
     <h1><a href="https://3d.kalidoface.com">kalidoface</a></h1>
     <nav>
       <a>
-        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Fnpm-226037.png?v=1635068381047"/>
+        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Fnpm.png?v=1635133318451"/>
       </a>
       <a>
-        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Fnpm-226037.png?v=1635068381047"/>
+        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Fgithub.png?v=1635133310517"/>
       </a>
       <a>
-        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Fnpm-226037.png?v=1635068381047"/>
+        <img src="https://cdn.glitch.me/447b6603-7eae-4da6-957d-73ee30c8e731%2Ftwitter.png?v=1635133322561"/>
       </a>
     </nav>
+    <script src="script.js"></script>
   </body>
 </html>
