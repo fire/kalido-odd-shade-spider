@@ -6,10 +6,10 @@
 }
 h1 {
   font-family: "Jelly";
-  font-size: 36px;
+  font-size: 32px;
   color: white;
   position: absolute;
-  top: -16px;
+  top: -12px;
   left: 16px;
   font-weight: normal;
   -webkit-font-feature-settings: "liga";
