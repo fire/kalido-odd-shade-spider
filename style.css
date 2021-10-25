@@ -68,3 +68,11 @@ nav img {
   hight: auto;
   margin-left: 22px;
 }
+
+ 
+@media only screen and (max-width: 600px) {
+  video{
+    max-width:160px;
+  }
+  
+}
