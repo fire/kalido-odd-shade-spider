@@ -9,12 +9,15 @@ h1 {
   font-size: 36px;
   color: white;
   position: absolute;
-  top: -8px;
+  top: -16px;
   left: 16px;
   font-weight: normal;
   -webkit-font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+h1:hover{
+  color: #13A3F3;
 }
 a,
 a:visited,
@@ -22,6 +25,10 @@ a:link {
   text-decoration: none;
   color: #222;
   display: flex;
+}
+a:hover,a:visited:hover,a:link:hover{
+  color:#13A3F3;
+  cursor:pointer;
 }
 .preview {
   display: flex;
@@ -52,12 +59,12 @@ canvas {
 }
 nav {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 12px;
+  right: 16px;
   display: flex;
 }
 nav img {
-  width: 40px;
+  width: 36px;
   hight: auto;
-  margin-left: 16px;
+  margin-left: 22px;
 }
