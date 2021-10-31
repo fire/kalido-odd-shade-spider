@@ -265,10 +265,10 @@ let videoElement = document.querySelector(".input_video"),
     guideCanvas = document.querySelector('canvas.guides');
 
 const onResults = (results) => {
-  // Animate model
-  animateVRM(currentVrm, results);
   // Draw landmark guides
   drawResults(results)
+  // Animate model
+  animateVRM(currentVrm, results);
 }
 
 const holistic = new Holistic({
