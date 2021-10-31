@@ -155,18 +155,7 @@ const rigFace = (riggedFace) => {
 const animateVRM = (vrm, results) => {
   if (!vrm) {
     return;
-  }
-  if (results.multiFaceLandmarks.length>0) {
-   
-   let riggedFace = Kalidokit.Face.solve(
-     results.multiFaceLandmarks[0],{
-       runtime:"mediapipe",
-       video:videoElement,
-       smoothBlink:false
-     });
-   rigFace(riggedFace)
-  }
-  return
+  }   
   // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
   let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
@@ -273,13 +262,13 @@ const animateVRM = (vrm, results) => {
 
 /* SETUP MEDIAPIPE HOLISTIC INSTANCE */
 let videoElement = document.querySelector(".input_video"),
-    guideCanvas = document.querySelector('canvas.guides'),facemesh
+    guideCanvas = document.querySelector('canvas.guides');
 
 const onResults = (results) => {
   // Animate model
   animateVRM(currentVrm, results);
   // Draw landmark guides
-  // drawResults(results)
+  drawResults(results)
 }
 
 const holistic = new Holistic({
@@ -297,17 +286,6 @@ const holistic = new Holistic({
   });
   // Pass holistic a callback function
   holistic.onResults(onResults);
-
-const faceMesh = new FaceMesh({locateFile: (file) => {
-  return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-}});
-faceMesh.setOptions({
-  maxNumFaces: 1,
-  refineLandmarks: true,
-  minDetectionConfidence: 0.5,
-  minTrackingConfidence: 0.5
-});
-faceMesh.onResults(onResults);
 
 const drawResults = (results) => {
   guideCanvas.width = videoElement.videoWidth;
@@ -349,8 +327,7 @@ const drawResults = (results) => {
 // Use `Mediapipe` utils to get camera - lower resolution = higher fps
 const camera = new Camera(videoElement, {
   onFrame: async () => {
-    // await holistic.send({image: videoElement});
-    await faceMesh.send({image: videoElement});
+    await holistic.send({image: videoElement});
   },
   width: 640,
   height: 480
