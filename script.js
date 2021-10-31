@@ -294,6 +294,7 @@ const drawResults = (results) => {
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
   // Use `Mediapipe` drawing functions
+  console.log(results.faceLandmarks)
   drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
       color: "#00cff7",
       lineWidth: 4
