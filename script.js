@@ -306,7 +306,7 @@ const drawResults = (results) => {
       color: "#C0C0C070",
       lineWidth: 1
     });
-    if(results.faceLandmarks.length === 478){
+    if(results.faceLandmarks && results.faceLandmarks.length === 478){
       //draw pupils
       drawLandmarks(canvasCtx, [results.faceLandmarks[468],results.faceLandmarks[468+5]], {
         color: "#ffe603",
