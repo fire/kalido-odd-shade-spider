@@ -273,7 +273,7 @@ const onResults = (results) => {
 
 const holistic = new Holistic({
     locateFile: file => {
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
     }
   });
 
@@ -282,7 +282,7 @@ const holistic = new Holistic({
     smoothLandmarks: true,
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7,
-    refineLandmarks: true,
+    refineFaceLandmarks: true,
   });
   // Pass holistic a callback function
   holistic.onResults(onResults);
@@ -294,7 +294,6 @@ const drawResults = (results) => {
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
   // Use `Mediapipe` drawing functions
-  console.log(results.faceLandmarks)
   drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
       color: "#00cff7",
       lineWidth: 4
