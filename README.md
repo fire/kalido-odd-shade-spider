@@ -1,6 +1,6 @@
-# KalidoKit - Vtuber Face and Full-Body Kinematics
+# KalidoKit - Face, Pose, and Hand Tracking Kinematics
 
-Kalidokit is a blendshape and kinematics solver for Mediapipe/TFJS Models: [Facemesh](https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection), [Blazepose](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection), [Handpose](https://google.github.io/mediapipe/solutions/hands.html), and [Holistic](https://google.github.io/mediapipe/solutions/holistic.html). It takes the 3D point cloud and turns into easy-to-use rotations and values for a variety of application uses.
+Kalidokit is a blendshape and kinematics solver for Mediapipe/Tensorflow.js face, eyes, pose, and hand tracking models, compatible with [Facemesh](https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection), [Blazepose](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection), [Handpose](https://google.github.io/mediapipe/solutions/hands.html), and [Holistic](https://google.github.io/mediapipe/solutions/holistic.html). It takes predicted 3D landmarks and calculates simple euler rotations and blendshape face values.
 
 As the core to Vtuber web apps, [Kalidoface](https://kalidoface.com) and [Kalidoface 3D](https://3d.kalidoface.com), KalidoKit is designed specifically for rigging 3D VRM models and Live2D avatars!
 
@@ -27,7 +27,7 @@ import { Face, Pose, Hand } from "kalidokit";
 #### Via CDN
 
 ```js
-<script src="https://cdn.jsdelivr.net/npm/kalidokit@0.0.00/dist/kalidokit.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/kalidokit@0.1.0/dist/kalidokit.umd.js"></script>
 ```
 
 ## Methods
@@ -35,19 +35,53 @@ import { Face, Pose, Hand } from "kalidokit";
 Kalidokit is composed of 3 classes for Face, Pose, and Hand calculations. They accept landmark outputs from models like Facemesh, Blazepose, Handpose, and Holistic.
 
 ```js
-Kalidokit.Face.solve(facelandmarkArray);
-Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray);
-Kalidokit.Hand.solve(handLandmarkArray, "Right"); //'Right' or 'Left'
+// Accepts an array(468 or 478 with iris tracking) of vectors
+Kalidokit.Face.solve(facelandmarkArray, {
+    runtime: "tfjs", // `mediapipe` or `tfjs`
+    video: HTMLVideoElement,
+    imageSize: { height: 0, width: 0 },
+    smoothBlink: false, // smooth left and right eye blink delays
+    blinkSettings: [0.25, 0.75], // adjust upper and lower bound blink sensitivity
+});
 
-//Using Exported Members
+// Accepts arrays(33) of Pose keypoints and 3D Pose keypoints
+Kalidokit.Pose.solve(poseWorld3DArray, poseLandmarkArray, {
+    runtime: "tfjs", // `mediapipe` or `tfjs`
+    video: HTMLVideoElement,
+    imageSize: { height: 0, width: 0 },
+    enableLegs: true,
+});
+
+// Accepts array(21) of hand landmark vectors; specify 'Right' or 'Left' side
+Kalidokit.Hand.solve(handLandmarkArray, "Right");
+
+// Using exported classes directly
 Face.solve(facelandmarkArray);
 Pose.solve(poseWorld3DArray, poseLandmarkArray);
 Hand.solve(handLandmarkArray, "Right");
 ```
 
-## KalidoKit Template for Vtubing
+Additional Utils
 
-You're on it right now! Quick-start your Vtuber app with this example template on Glitch. This demo uses Mediapipe Holistic, Three.js, and Three-VRM. Feel free to make it your own!
+```js
+// Stabilizes left/right blink delays + wink by providing blenshapes and head rotation
+Kalidokit.Face.stabilizeBlink(
+    { r: 0, l: 1 }, // left and right eye blendshape values
+    headRotationY, // head rotation in radians
+    {
+        noWink = false, // disables winking
+        maxRot = 0.5 // max head rotation in radians before interpolating obscured eyes
+    });
+
+// The internal vector math class
+Kalidokit.Vector();
+```
+
+## Remixable VRM Template with KalidoKit
+
+![KalidoKit Template on Glitch](https://github.com/yeemachine/kalidokit/blob/main/docs/kalidokit_glitch.gif?raw=true)
+
+Quick-start your Vtuber app with this simple remixable example on Glitch. Face, full-body, and hand tracking in under 350 lines of javascript. This demo uses Mediapipe Holistic for body tracking, Three.js + Three-VRM for rendering models, and KalidoKit for the kinematic calculations. This demo uses a minimal amount of easing to smooth animations, but feel free to make it your own!
 
 <a href="https://glitch.com/edit/#!/remix/kalidokit-template"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
 
@@ -61,24 +95,24 @@ import '@mediapipe/holistic/holistic';
 
 let holistic
 
-//Init Mediapipe Holistic Model
+// Init Mediapipe Holistic Model
 async function initHolistic() {
 
   holistic = new Holistic({locateFile: (file) => {
-    return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4/${file}`;
+    return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
   }});
 
   holistic.onResults(results=>{
-    //do something with prediction results
-    //landmark names may change depending on TFJS/Mediapipe model version
+    // do something with prediction results
+    // landmark names may change depending on TFJS/Mediapipe model version
     let facelm = results.faceLandmarks;
     let poselm = results.poseLandmarks;
     let poselm3D = results.ea;
     let rightHandlm = results.rightHandLandmarks;
     let leftHandlm = results.leftHandLandmarks;
 
-    let faceRig = Kalidokit.Face.solve(facelm)
-    let poseRig = Kalidokit.Pose.solve(poselm3d,poselm)
+    let faceRig = Kalidokit.Face.solve(facelm,{runtime:'mediapipe',video:HTMLVideoElement})
+    let poseRig = Kalidokit.Pose.solve(poselm3d,poselm,{runtime:'mediapipe',video:HTMLVideoElement})
     let rightHandRig = Kalidokit.Hand.solve(rightHandlm,"Right")
     let leftHandRig = Kalidokit.Hand.solve(leftHandlm,"Left")
 
@@ -87,10 +121,10 @@ async function initHolistic() {
 }
 initHolistic()
 
-//Predict animation loop
+// Predict animation loop
 async function predict(){
     if(holistic){
-        //send image to holistic prediction
+        // send image to holistic prediction
         await holistic.send({image: HTMLVideoElement});
     }
     requestAnimationFrame(predict);
@@ -100,12 +134,12 @@ predict()
 
 ## Slight differences with Mediapipe and Tensorflow.js
 
-For Face and Pose pretrained models from Mediapipe and Tensorflow.js, there are slight differences in the output values and API. It is recommended to specify which runtime version you are using as well as the video input/image size as options when running tensorflow.js models.
+Due to slight differences in the results from Mediapipe and Tensorflow.js, it is recommended to specify which runtime version you are using as well as the video input/image size as a reference.
 
 ```js
 Kalidokit.Pose.solve(poselm3D,poselm,{
-    runtime:'tfjs', //default is 'mediapipe
-    video: HTMLVideoElement,//specify an html video or manually set image size
+    runtime:'tfjs', // default is 'mediapipe'
+    video: HTMLVideoElement,// specify an html video or manually set image size
     imageSize:{
         width: 640,
         height: 480,
@@ -113,7 +147,12 @@ Kalidokit.Pose.solve(poselm3D,poselm,{
 })
 
 Kalidokit.Face.solve(facelm,{
-    runtime:'tfjs', //default is 'mediapipe
+    runtime:'mediapipe', // default is 'tfjs'
+    video: HTMLVideoElement,// specify an html video or manually set image size
+    imageSize:{
+        width: 640,
+        height: 480,
+    };
 })
 ```
 
@@ -122,9 +161,9 @@ Kalidokit.Face.solve(facelm,{
 Below are the resting defaults from Kalidokit.
 
 ```js
-//Kalidokit.Face.solve()
-//Head rotations in radians
-//Degrees and normalized rotations also available
+// Kalidokit.Face.solve()
+// Head rotations in radians
+// Degrees and normalized rotations also available
 {
     eye: {l: 1,r: 1},
     mouth: {
@@ -146,8 +185,8 @@ Below are the resting defaults from Kalidokit.
 ```
 
 ```js
-//Kalidokit.Pose.solve()
-//Joint rotations in radians, leg calculators are a WIP
+// Kalidokit.Pose.solve()
+// Joint rotations in radians, leg calculators are a WIP
 {
     RightUpperArm: {x: 0, y: 0, z: -1.25},
     LeftUpperArm: {x: 0, y: 0, z: 1.25},
@@ -168,10 +207,10 @@ Below are the resting defaults from Kalidokit.
 ```
 
 ```js
-//Kalidokit.Hand.solve()
-//Joint rotations in radians
-//only wrist and thumb have 3 degrees of freedom
-//all other finger joints move in the Z axis only
+// Kalidokit.Hand.solve()
+// Joint rotations in radians
+// only wrist and thumb have 3 degrees of freedom
+// all other finger joints move in the Z axis only
 {
     RightWrist: {x: -0.13, y: -0.07, z: -1.04},
     RightRingProximal: {x: 0, y: 0, z: -0.13},
@@ -192,6 +231,6 @@ Below are the resting defaults from Kalidokit.
 }
 ```
 
-## Contributions
+## Open to Contributions
 
 The current library is a work in progress and contributions to improve it are very welcome. Our goal is to make character face and pose animation even more accessible to creatives regardless of skill level!
