@@ -4,9 +4,9 @@ Kalidokit is a blendshape and kinematics solver for Mediapipe/Tensorflow.js face
 
 As the core to Vtuber web apps, [Kalidoface](https://kalidoface.com) and [Kalidoface 3D](https://3d.kalidoface.com), KalidoKit is designed specifically for rigging 3D VRM models and Live2D avatars!
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B75DIY1)
-
 <a href="https://glitch.com/edit/#!/kalidokit"><img src="https://github.com/yeemachine/kalidokit/blob/main/docs/kalidokit_glitch.gif?raw=true" alt="Kalidokit Template" width="100%"/></a>
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B75DIY1)
 
 ## Install
 
@@ -27,7 +27,7 @@ import { Face, Pose, Hand } from "kalidokit";
 #### Via CDN
 
 ```js
-<script src="https://cdn.jsdelivr.net/npm/kalidokit@0.1.0/dist/kalidokit.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/kalidokit@1.0/dist/kalidokit.umd.js"></script>
 ```
 
 ## Methods
@@ -81,26 +81,22 @@ Kalidokit.Vector();
 
 Quick-start your Vtuber app with this simple remixable example on Glitch. Face, full-body, and hand tracking in under 350 lines of javascript. This demo uses Mediapipe Holistic for body tracking, Three.js + Three-VRM for rendering models, and KalidoKit for the kinematic calculations. This demo uses a minimal amount of easing to smooth animations, but feel free to make it your own!
 
-<a href="https://glitch.com/edit/#!/remix/kalidokit-template"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
+<a href="https://glitch.com/edit/#!/kalidokit-template"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
 
 ## Basic Usage
 
 The implementation may vary depending on what pose and face detection model you choose to use, but the principle is still the same. This example uses Mediapipe Holistic which concisely combines them together.
 
 ```js
-import Kalidokit from 'kalidokit'
+import * as Kalidokit from 'kalidokit'
 import '@mediapipe/holistic/holistic';
+import '@mediapipe/camera_utils/camera_utils';
 
-let holistic
-
-// Init Mediapipe Holistic Model
-async function initHolistic() {
-
-  holistic = new Holistic({locateFile: (file) => {
+let holistic = new Holistic({locateFile: (file) => {
     return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4.1633559476/${file}`;
-  }});
+}});
 
-  holistic.onResults(results=>{
+holistic.onResults(results=>{
     // do something with prediction results
     // landmark names may change depending on TFJS/Mediapipe model version
     let facelm = results.faceLandmarks;
@@ -115,19 +111,17 @@ async function initHolistic() {
     let leftHandRig = Kalidokit.Hand.solve(leftHandlm,"Left")
 
     };
-  });
-}
-initHolistic()
+});
 
-// Predict animation loop
-async function predict(){
-    if(holistic){
-        // send image to holistic prediction
-        await holistic.send({image: HTMLVideoElement});
-    }
-    requestAnimationFrame(predict);
-}
-predict()
+// use Mediapipe's webcam utils to send video to holistic every frame
+const camera = new Camera(HTMLVideoElement, {
+  onFrame: async () => {
+    await holistic.send({image: HTMLVideoElement});
+  },
+  width: 640,
+  height: 480
+});
+camera.start();
 ```
 
 ## Slight differences with Mediapipe and Tensorflow.js
@@ -156,9 +150,7 @@ Kalidokit.Face.solve(facelm,{
 
 ## Outputs
 
-[![Kalidoface virtual webcam](https://raw.githubusercontent.com/yeemachine/kalidoface-live2d-models/main/promo/TW-Promo-short.gif)](https://kalidoface.com) [![Kalidoface Pose Demo](https://cdn.glitch.me/29e07830-2317-4b15-a044-135e73c7f840%2Fkalidoface-pose-dance.gif?v=1633453098775)](https://3d.kalidoface.com)
-
-Below are the expected results from Kalidokit solvers.
+Below are the expected results from KalidoKit solvers.
 
 ```js
 // Kalidokit.Face.solve()
@@ -200,6 +192,7 @@ Below are the expected results from Kalidokit solvers.
     RightHand: {x: 0, y: 0, z: 0},
     Spine: {x: 0, y: 0, z: 0},
     Hips: {
+        worldPosition: {x: 0, y: 0, z: 0},
         position: {x: 0, y: 0, z: 0},
         rotation: {x: 0, y: 0, z: 0},
     }
@@ -230,6 +223,12 @@ Below are the expected results from Kalidokit solvers.
     RightLittleDistal: {x: 0, y: 0, z: -0.1}
 }
 ```
+
+## Community Showcase
+
+If you'd like to share a creative use of KalidoKit, we would love to hear about it! Feel free to also use our Twitter hashtag, [#kalidokit](https://twitter.com/search?q=%23kalidokit).
+
+[![Kalidoface virtual webcam](https://raw.githubusercontent.com/yeemachine/kalidoface-live2d-models/main/promo/TW-Promo-short.gif)](https://kalidoface.com) [![Kalidoface Pose Demo](https://cdn.glitch.me/29e07830-2317-4b15-a044-135e73c7f840%2Fkalidoface-pose-dance.gif?v=1633453098775)](https://3d.kalidoface.com)
 
 ## Open to Contributions
 
