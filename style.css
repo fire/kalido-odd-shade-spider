@@ -16,7 +16,7 @@ h1 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-h1:hover{
+h1:hover {
   color: #13A3F3;
 }
 a,
@@ -26,9 +26,11 @@ a:link {
   color: #222;
   display: flex;
 }
-a:hover,a:visited:hover,a:link:hover{
-  color:#13A3F3;
-  cursor:pointer;
+a:hover,
+a:visited:hover,
+a:link:hover {
+  color: #13A3F3;
+  cursor: pointer;
 }
 .preview {
   display: flex;
@@ -68,11 +70,20 @@ nav img {
   hight: auto;
   margin-left: 22px;
 }
+p {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  display: inline;
+}
+#full {
+  display: inline;
+}
 
- 
 @media only screen and (max-width: 600px) {
-  video{
-    max-width:160px;
+  video {
+    max-width: 160px;
   }
-  
 }
