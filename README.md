@@ -1,4 +1,6 @@
-# KalidoKit - Face, Pose, and Hand Tracking Kinematics
+<img src="https://github.com/yeemachine/kalidokit/blob/main/docs/kalidokit-logo.png?raw=true" alt="Kalidokit Template" width="200ps" style="margin-bottom:10px"/>
+
+## VRM Vtuber Template
 
 Kalidokit is a blendshape and kinematics solver for Mediapipe/Tensorflow.js face, eyes, pose, and hand tracking models, compatible with [Facemesh](https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection), [Blazepose](https://github.com/tensorflow/tfjs-models/tree/master/pose-detection), [Handpose](https://google.github.io/mediapipe/solutions/hands.html), and [Holistic](https://google.github.io/mediapipe/solutions/holistic.html). It takes predicted 3D landmarks and calculates simple euler rotations and blendshape face values.
 
@@ -27,7 +29,7 @@ import { Face, Pose, Hand } from "kalidokit";
 #### Via CDN
 
 ```js
-<script src="https://cdn.jsdelivr.net/npm/kalidokit@1.0/dist/kalidokit.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1/dist/kalidokit.umd.js"></script>
 ```
 
 ## Methods
@@ -77,11 +79,29 @@ Kalidokit.Face.stabilizeBlink(
 Kalidokit.Vector();
 ```
 
-## Remixable VRM Template with KalidoKit
+## VRM and Live2D Sample Code
 
-Quick-start your Vtuber app with this simple remixable example on Glitch. Face, full-body, and hand tracking in under 350 lines of javascript. This demo uses Mediapipe Holistic for body tracking, Three.js + Three-VRM for rendering models, and KalidoKit for the kinematic calculations. This demo uses a minimal amount of easing to smooth animations, but feel free to make it your own!
+Quick-start your Vtuber app with these simple remixable examples.
 
-<a href="https://glitch.com/edit/#!/kalidokit-template"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
+### VRM Glitch Template
+
+Face, full-body, and hand tracking in under 350 lines of javascript. This demo uses Mediapipe Holistic for body tracking, Three.js + Three-VRM for rendering models, and KalidoKit for the kinematic calculations. This [demo](https://glitch.com/edit/#!/kalidokit) uses a minimal amount of easing to smooth animations, but feel free to make it your own! VRM model from [Vroid Hub](https://hub.vroid.com/en/characters/6617701103638326208/models/8892157442595230149).
+
+<a href="https://glitch.com/edit/#!/kalidokit"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
+
+### Live2D Glitch Template
+
+This demo uses Mediapipe FaceMesh for face tracking, Pixi.js + pixi-live2d-display for rendering models, and KalidoKit for the kinematic calculations. This [demo](https://glitch.com/edit/#!/kalidokit) uses an official sample Live2D model, [Hiyori](https://www.live2d.com/en/download/sample-data/).
+
+<a href="https://glitch.com/edit/#!/kalidokit"><img alt="Remix on Glitch" src="https://cdn.gomix.com/f3620a78-0ad3-4f81-a271-c8a4faa20f86%2Fremix-button.svg"></a>
+
+### Local VRM and Live2D Examples
+
+Interested in contributing? If you clone this project, the `docs` folder includes both VRM and Live2D KalidoKit templates. Run the `test` script to build the library and start up the dev server. The VRM demo will be hosted on `localhost:3000` and Live2D on `localhost:3000/live2d/`.
+
+```
+npm run test
+```
 
 ## Basic Usage
 
@@ -228,10 +248,10 @@ Below are the expected results from KalidoKit solvers.
 
 ## Community Showcase
 
-If you'd like to share a creative use of KalidoKit, we would love to hear about it! Feel free to also use our Twitter hashtag, [#kalidokit](https://twitter.com/search?q=%23kalidokit).
+If you'd like to share a creative use of KalidoKit, please reach out or send a pull request! Feel free to also use our Twitter hashtag, [#kalidokit](https://twitter.com/search?q=%23kalidokit).
 
 [![Kalidoface virtual webcam](https://raw.githubusercontent.com/yeemachine/kalidoface-live2d-models/main/promo/TW-Promo-short.gif)](https://kalidoface.com) [![Kalidoface Pose Demo](https://cdn.glitch.me/29e07830-2317-4b15-a044-135e73c7f840%2Fkalidoface-pose-dance.gif?v=1633453098775)](https://3d.kalidoface.com)
 
-## Open to Contributions
+## Contributing
 
-The current library is a work in progress and contributions to improve it are very welcome. Our goal is to make character face and pose animation even more accessible to creatives regardless of skill level!
+The current library is a work in progress and contributions to improve it are very welcome! Some plans include: better facial blendshapes, full leg tracking, and improved efficiency.
