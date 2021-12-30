@@ -2,8 +2,9 @@
   "name": "odd-shade-spider",
   "version": "1.0.0",
   "description": "<img src=\"https://github.com/yeemachine/kalidokit/blob/main/docs/kalidokit-logo.png?raw=true\" alt=\"Kalidokit Template\" width=\"200ps\" style=\"margin-bottom:10px\"/>",
-  "main": "script.js",
+  "main": "main.js",
   "scripts": {
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,5 +15,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^16.0.5"
+  },
+  "dependencies": {
+    "kalidokit": "^1.1.2"
   }
 }
