@@ -1,0 +1,18 @@
+{
+  "name": "odd-shade-spider",
+  "version": "1.0.0",
+  "description": "<img src=\"https://github.com/yeemachine/kalidokit/blob/main/docs/kalidokit-logo.png?raw=true\" alt=\"Kalidokit Template\" width=\"200ps\" style=\"margin-bottom:10px\"/>",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://237353c5-375b-41e6-babb-769c0bb88438@api.glitch.com/git/odd-shade-spider"
+  },
+  "author": "V-Sekai & K. S. Ernest (iFire) Lee",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^16.0.5"
+  }
+}
